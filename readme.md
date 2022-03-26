@@ -1,6 +1,8 @@
 # FLEABOT
 ## A Discord bot dedicated to the Red  Hot Chili Peppers band.
 
+<p align="center"><img src="readme/fleabot.png" alt="trivia" width="150"/></p>
+
 Fleabot is a Discord bot dedicated to the chili peppers. You can give it commands to guess lyrics (pulled from a JSON with the band's lyrics in 278 songs, pulled from [genius.com](genius.com), guess what year some images were taken from (pulled from a JSON with getty images URL's), and [pass down the stratocaster](https://knowyourmeme.com/memes/pass-the-ball-down).
 
 It's written in [DiscordJS](https://discord.js.org/) with some Python to pull lyrics from genius.com. It has command handling for the different commands which include:
@@ -29,7 +31,11 @@ It's written in [DiscordJS](https://discord.js.org/) with some Python to pull ly
 # Installation | How to use the Bot
 
  **1.** Install NodeJS
+
  **2.** Download this repo and unzip it   | or git clone it.
+
  **3.** Open CMD and Install all of the packages with **`npm install`**
+
   **4.** Make sure you put down the credentials **`clientId`**, **`guildId`** and the **`token`** keys in a  **`config.json`** file. More info [here](https://discordjs.guide/creating-your-bot/#creating-configuration-files).
+
  **5.** start the bot with **`node fleabot.js`**
