@@ -11,6 +11,11 @@ It's written in [DiscordJS](https://discord.js.org/) with some Python to pull ly
 - /passdown for passing down a Stratocaster.
 
 # Features
+## Pull posts from the RHCP subreddit
+
+## Pull posts from official Twitter accounts
+Thanks to [DiscordTwitterBot](https://github.com/otherwiseDE/DiscordTwitterBot) for the guide and code. 
+
 ## /trivia
 <p align="center"><img src="readme/trivia.png" alt="trivia" width="300"/></p>
 

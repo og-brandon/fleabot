@@ -1,13 +1,95 @@
-const { token } = require("./config.json");
-const fs = require("node:fs");
 const { Client, Collection, Intents } = require("discord.js");
 const fetch = require("node-fetch");
 const { MessageEmbed } = require("discord.js");
+const Twit = require("node-tweet-stream");
+const fs = require("fs");
+const decodeN = require('html-entities')
+
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
+
+// https://github.com/otherwisee/DiscordTwitterBot thanks for twitter guide
 
 const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
 
 const rhcpURL = "https://www.reddit.com/r/redhotchilipeppers/new.json?t=hour";
 rhcp_subreddit_channel_ID = "957791328752775239";
+
+//twitter client ---------------------------------------
+const t = new Twit({
+  consumer_key: config.twitterConsumerKey,
+  consumer_secret: config.twitterConsumerSecret,
+  //app_only_auth:true,
+  //access_token_key:config.twitterAccessTokenKey,
+  //access_token_secret:config.twitterAccessTokenSecret
+  token: config.twitterAccessTokenKey,
+  token_secret: config.twitterAccessTokenSecret,
+});
+
+// Tweet Listener + Post
+t.on("tweet", function (tweet) {
+	if(isReply(tweet) === true){
+		pass 
+	} else {
+		let media = tweet.entities.media;
+		let tweetURL = `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`
+		chatPost(
+		  tweet.text,
+		  tweet.user.name,
+		  tweet.user.screen_name,
+		  tweetURL,
+		  tweet.user.profile_image_url,
+		  media
+		)
+	}})
+ 
+t.on("error", function (err) {
+  console.log("Oh no");
+});
+let track = config.following;
+for (var i = 0; i < track.length; i++) {
+  t.follow(track[i]);
+  console.log(`Following Twitter User [ID]${track[i]}`);
+}
+
+// twitter function
+function isReply(tweet) {
+	if (tweet.retweeted_status
+	  || tweet.in_reply_to_status_id
+	  || tweet.in_reply_to_status_id_str
+	  || tweet.in_reply_to_user_id
+	  || tweet.in_reply_to_user_id_str
+	  || tweet.in_reply_to_screen_name) return true;
+	return false;
+  }
+
+function chatPost(content, author, atAuthor, tweetURL, authorPfp, media) {
+	const authorTweet = author+' @'+atAuthor;
+  const message = new MessageEmbed()
+    .setColor("#00acee")
+    .setDescription(content)
+    .setTimestamp()
+    .setAuthor({
+      name: authorTweet,
+      iconURL: authorPfp,
+      url: tweetURL,
+    })
+    .setURL(tweetURL)
+    .setFooter({
+      text: "Twitter",
+      iconURL:
+        "https://camo.githubusercontent.com/3253f1e385efa0b09493d467f352e10414c3984064c6a4e99d4e705709018c43/68747470733a2f2f66696c6970706f62697374616666612e6769746875622e696f2f696d616765732f747769747465722e737667",
+    });
+
+  if (!!media)
+    for (var j = 0; j < media.length; j++) message.setImage(media[j].media_url);
+
+  for (const __channel of config.channelsToPost.map((x) =>
+    client.channels.cache.get(x)
+  ))
+    __channel.send({ embeds: [message] });
+}
+
+// -------------------------------
 
 client.commands = new Collection();
 const commandFiles = fs
@@ -33,11 +115,9 @@ client.once("ready", () => {
 
 //fetch reddit posts via cron every minute
 var cron = require("node-cron");
+const pass = require("./commands/pass");
 
 cron.schedule("* * * * *", () => {
-  console.log(
-  );
-
   let postsDate = [];
 
   fetch(rhcpURL)
@@ -61,17 +141,33 @@ cron.schedule("* * * * *", () => {
       let lastMinutePosts = [];
 
       postsIndexes.forEach((i) => {
-        lastMinutePosts.push({
-          title: postsJSON["data"]["children"][i]["data"]["title"].substring(0, 255),
+        dictionary_to_push = {
+          title: decodeN.decode(postsJSON["data"]["children"][i]["data"]["title"].substring(
+            0,
+            255
+          )),
           reddit_url:
             "https://www.reddit.com/" +
             postsJSON["data"]["children"][i]["data"]["permalink"],
           media_url: postsJSON["data"]["children"][i]["data"]["url"],
           user: postsJSON["data"]["children"][i]["data"]["author"],
-          self: postsJSON["data"]["children"][i]["data"]["selftext"].substring(0, 4000),
-        });
+          self: decodeN.decode(postsJSON["data"]["children"][i]["data"]["selftext"].substring(
+            0,
+            4000
+          )),
+        };
+
+        // replaces cases where self posts is just preview link broken
+        if (dictionary_to_push.self.startsWith("&amp")) {
+          dictionary_to_push.media_url = Object.values(
+            postsJSON["data"]["children"][0]["data"]["media_metadata"]
+          )[0]["p"][0]["u"].replace("preview", "i");
+          dictionary_to_push.self = "";
+        }
+
+        lastMinutePosts.push(dictionary_to_push);
       });
-	  
+
       const channel = client.channels.cache.get(rhcp_subreddit_channel_ID);
 
       lastMinutePosts.forEach((post) => {
@@ -80,22 +176,23 @@ cron.schedule("* * * * *", () => {
           .setTitle(post.title)
           .setDescription(post.self)
           .setTimestamp()
-		  .setThumbnail(
-			'https://raw.githubusercontent.com/og-brandon/fleabot/master/images/snoo.png'
-		  )
-		  .setImage(post.media_url)
-		  .setURL(post.reddit_url)
+          .setThumbnail(
+            post.media_url
+          )
+          .setURL(post.reddit_url)
           .setFooter({
-            text: '/r/RedHotChiliPeppers | u/'+ post.user,
+            text: "/u/" + post.user,
             iconURL:
-              "https://i.pinimg.com/originals/62/bd/2e/62bd2e623b0b6f08a672581b55c6c1a9.png",
+              "https://github.com/og-brandon/fleabot/blob/master/images/snoo.png?raw=true",
           });
+
+		  if(post.self || (!post.self && !post.media_url)){
+			  subredditEmbed.setThumbnail('https://github.com/og-brandon/fleabot/blob/master/images/snoo.png?raw=true')
+		  }
 
         channel.send({ embeds: [subredditEmbed] });
       });
-
     });
-
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -116,7 +213,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-client.login(token);
+client.login(config.token);
 
 // const redditFetch = require('reddit-fetch');
 

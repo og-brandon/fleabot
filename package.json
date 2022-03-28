@@ -6,8 +6,11 @@
     "discord-api-types": "^0.30.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
+    "fs": "^0.0.1-security",
+    "html-entities": "^2.3.3",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
+    "node-tweet-stream": "^2.1.0",
     "reddit-fetch": "^1.5.1"
   }
 }
