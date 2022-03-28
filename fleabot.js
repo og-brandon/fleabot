@@ -62,13 +62,13 @@ cron.schedule("* * * * *", () => {
 
       postsIndexes.forEach((i) => {
         lastMinutePosts.push({
-          title: postsJSON["data"]["children"][i]["data"]["title"],
+          title: postsJSON["data"]["children"][i]["data"]["title"].substring(0, 255),
           reddit_url:
             "https://www.reddit.com/" +
             postsJSON["data"]["children"][i]["data"]["permalink"],
           media_url: postsJSON["data"]["children"][i]["data"]["url"],
           user: postsJSON["data"]["children"][i]["data"]["author"],
-          self: postsJSON["data"]["children"][i]["data"]["selftext"],
+          self: postsJSON["data"]["children"][i]["data"]["selftext"].substring(0, 4000),
         });
       });
 	  
@@ -81,7 +81,7 @@ cron.schedule("* * * * *", () => {
           .setDescription(post.self)
           .setTimestamp()
 		  .setThumbnail(
-			'https://williamshammond.github.io/python-visuals-for-reddit/redditlogo.png'
+			'https://raw.githubusercontent.com/og-brandon/fleabot/master/images/snoo.png'
 		  )
 		  .setImage(post.media_url)
 		  .setURL(post.reddit_url)
