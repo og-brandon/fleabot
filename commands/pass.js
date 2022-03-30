@@ -10,7 +10,7 @@ module.exports = {
       .setTitle("Pass the Stratocaster down")
       .setColor("#ff0019")
       .setImage(
-        "https://media.discordapp.net/attachments/956617892181475431/957040927657062480/pass.gif"
+        "https://raw.githubusercontent.com/og-brandon/fleabot/master/images/pass.gif"
       );
 
     await interaction.reply({ embeds: [passEmbed] });
