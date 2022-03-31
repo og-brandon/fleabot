@@ -17,7 +17,7 @@ It's written in [DiscordJS](https://discord.js.org/) with some Python to pull ly
 
 ## Pull posts from official Twitter accounts
 <p align="center"><img src="readme/twitterBot.png" alt="twitter" width="300"/></p>
-- Thanks to [DiscordTwitterBot](https://github.com/otherwiseDE/DiscordTwitterBot) for the guide and code. 
+- Thanks to DiscordTwitterBot - https://github.com/otherwiseDE/DiscordTwitterBot for the guide and code. 
 - Pulls tweets the moment they are posted to a discord channel
 
 
