@@ -12,9 +12,14 @@ It's written in [DiscordJS](https://discord.js.org/) with some Python to pull ly
 
 # Features
 ## Pull posts from the RHCP subreddit
+<p align="center"><img src="readme/subreddit.png" alt="subreddit" width="300"/></p>
+- Pulls posts from the /r/RedHotChiliPeppers subreddit every minute in embed format to a specific channel
 
 ## Pull posts from official Twitter accounts
-Thanks to [DiscordTwitterBot](https://github.com/otherwiseDE/DiscordTwitterBot) for the guide and code. 
+<p align="center"><img src="readme/twitterBot.png" alt="twitter" width="300"/></p>
+- Thanks to [DiscordTwitterBot](https://github.com/otherwiseDE/DiscordTwitterBot) for the guide and code. 
+- Pulls tweets the moment they are posted to a discord channel
+
 
 ## /trivia
 <p align="center"><img src="readme/trivia.png" alt="trivia" width="300"/></p>
@@ -41,6 +46,8 @@ Thanks to [DiscordTwitterBot](https://github.com/otherwiseDE/DiscordTwitterBot) 
 
  **3.** Open CMD and Install all of the packages with **`npm install`**
 
-  **4.** Make sure you put down the credentials **`clientId`**, **`guildId`** and the **`token`** keys in a  **`config.json`** file. More info [here](https://discordjs.guide/creating-your-bot/#creating-configuration-files).
+**4.** Make sure you put down the credentials **`clientId`**, **`guildId`** and the **`token`**, along with twitter keys and channel ID's keys in a  **`config.json`** file. More info [here](https://discordjs.guide/creating-your-bot/#creating-configuration-files).
 
- **5.** start the bot with **`node fleabot.js`**
+**5.** Add the bot in Discord Developer dashboard.
+
+ **6s** start the bot with **`node fleabot.js`**
