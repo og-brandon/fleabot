@@ -51,4 +51,4 @@ It's written in [DiscordJS](https://discord.js.org/) with some Python to pull ly
 
 **5.** Add the bot in Discord Developer dashboard.
 
- **6s** start the bot with **`node fleabot.js`**
+ **6.** start the bot with **`node fleabot.js`**
