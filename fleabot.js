@@ -112,13 +112,13 @@ client.once("ready", () => {
   console.log("Flea is ready!");
 });
 
-if(config.rhcp_subreddit_toggle){
-	client.on("messageCreate", (message) => {
-		if (message.content == "ping") {
-		  message.reply("pong");
-		}
-	  });
-	  
+// client.on("messageCreate", (message) => {
+// 	if (message.content == "ping") {
+// 	  message.reply("pong");
+// 	}
+//   });
+
+if(config.rhcp_subreddit_toggle){  
 	  //fetch reddit posts via cron every minute
 	  var cron = require("node-cron");
 	  const pass = require("./commands/pass");
