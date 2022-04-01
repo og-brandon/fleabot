@@ -11,7 +11,7 @@ const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
 const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
 
-const rhcpURL = "https://www.reddit.com/r/Eldenring/new.json?t=hour";
+const rhcpURL = "https://www.reddit.com/r/RedHotChiliPeppers/new.json?t=hour";
 
 //twitter client ---------------------------------------
 const t = new Twit({
@@ -208,7 +208,7 @@ if(config.rhcp_subreddit_toggle){
 				  post.self ||
 				  (!post.self &&
 					post.media_url.startsWith(
-					  "https://www.reddit.com/r/Eldenring/comments"
+					  "https://www.reddit.com/r/RedHotChiliPeppers/comments"
 					))
 				) {
 				  subredditEmbed.setThumbnail(
