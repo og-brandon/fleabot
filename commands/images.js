@@ -2,6 +2,11 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const wait = require("node:timers/promises").setTimeout;
 
+const waitTime = 10
+const waitTimeBot = waitTime * 1000
+const waitTimeText = `Guess in ${waitTime} seconds!`
+
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("images")
@@ -24,7 +29,7 @@ module.exports = {
       .setTimestamp()
       .setImage(gettyImg_URL)
       .setFooter({
-        text: "Guess in 15 seconds!",
+        text: waitTimeText,
         iconURL:
           "https://i.pinimg.com/originals/62/bd/2e/62bd2e623b0b6f08a672581b55c6c1a9.png",
       });
@@ -47,7 +52,7 @@ module.exports = {
       });
 
     await interaction.reply({ embeds: [firstReplyEmbed] });
-    await wait(15000);
+    await wait(waitTimeBot);
     await interaction.followUp({ embeds: [secondReplyEmbed] });
   },
 };
