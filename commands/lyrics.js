@@ -58,7 +58,7 @@ module.exports = {
       .setTitle(songTitle)
       .setURL(songUrl)
       .setDescription(
-        "Check this song's lyrics on [Genius.com](" + songUrl + ")"
+        sectionChosen + `\nCheck this song's lyrics at [Genius.com](${songUrl})`
       )
       .setThumbnail(
         "https://i.pinimg.com/236x/39/2e/2a/392e2a325bcaa3caafe4efb6eec5f2a9--a-dream-anthony-kiedis.jpg"
@@ -73,7 +73,7 @@ module.exports = {
 
     await interaction.reply({ embeds: [firstReplyEmbed] });
     await wait(waitTimeBot);
-    await interaction.followUp({ embeds: [secondReplyEmbed] });
+    await interaction.editReply({ embeds: [secondReplyEmbed] });
   },
 };
 
