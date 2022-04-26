@@ -10,7 +10,7 @@ const wait = require("node:timers/promises").setTimeout;
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("image")
-    .setDescription("Guess the year of the image!"),
+    .setDescription("Get a random image from the band!"),
   async execute(interaction) {
     const gettyJSON = require("./rhcpGetty.json");
 

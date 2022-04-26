@@ -9,7 +9,7 @@ const waitTimeText = `Guess in ${waitTime} seconds!`
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("lyrics")
-    .setDescription("Answer the bots trivia!"),
+    .setDescription("Guess which song it is based on the lyrics!"),
   async execute(interaction) {
     const rhcpJSON = require("./rhcplyrics.json");
 
