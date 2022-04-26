@@ -2,14 +2,14 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const wait = require("node:timers/promises").setTimeout;
 
-const waitTime = 10
-const waitTimeBot = waitTime * 1000
-const waitTimeText = `Guess in ${waitTime} seconds!`
+// const waitTime = 10
+// const waitTimeBot = waitTime * 1000
+// const waitTimeText = `Guess in ${waitTime} seconds!`
 
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("images")
+    .setName("rhcpimages")
     .setDescription("Guess the year of the image!"),
   async execute(interaction) {
     const gettyJSON = require("./rhcpGetty.json");
@@ -23,18 +23,7 @@ module.exports = {
     gettyImg_URL = gettyJSON[randomNumber]["img_URL"];
     gettyURL = gettyJSON[randomNumber]["getty_URL"];
 
-    const firstReplyEmbed = new MessageEmbed()
-      .setColor("#ff0019")
-      .setTitle("Guess the year this photo was taken:")
-      .setTimestamp()
-      .setImage(gettyImg_URL)
-      .setFooter({
-        text: waitTimeText,
-        iconURL:
-          "https://i.pinimg.com/originals/62/bd/2e/62bd2e623b0b6f08a672581b55c6c1a9.png",
-      });
-
-    const secondReplyEmbed = new MessageEmbed()
+    const imageEmbed = new MessageEmbed()
       .setColor("#ff0019")
       .setTitle(gettyYear)
       .setURL(gettyURL)
@@ -43,17 +32,15 @@ module.exports = {
       )
       .addField('People', gettyPeople, true)
       .addField('Photographer', gettyPhotographer, true)
-      .setThumbnail(gettyImg_URL)
+      .setImage(gettyImg_URL)
       .setTimestamp()
       .setFooter({
-        text: "gettyimages",
+        text: "Red Hot Chili Peppers Images",
         iconURL:
           "https://i.pinimg.com/originals/62/bd/2e/62bd2e623b0b6f08a672581b55c6c1a9.png",
       });
 
-    await interaction.reply({ embeds: [firstReplyEmbed] });
-    await wait(waitTimeBot);
-    await interaction.followUp({ embeds: [secondReplyEmbed] });
+    await interaction.reply({ embeds: [imageEmbed] });
   },
 };
 
