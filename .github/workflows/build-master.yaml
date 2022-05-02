@@ -9,7 +9,8 @@ jobs:
   build-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - id: run docker build
-        run: |
-          docker build .
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: funky-monks/fleabot:latest
