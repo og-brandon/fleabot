@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const wait = require("node:timers/promises").setTimeout;
 
-const waitTime = 10
+const waitTime = 15
 const waitTimeBot = waitTime * 1000
 const waitTimeText = `Guess in ${waitTime} seconds!`
 
