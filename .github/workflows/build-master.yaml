@@ -1,0 +1,14 @@
+name: build-master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: run docker build
+        run: docker build .
