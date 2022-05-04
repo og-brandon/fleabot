@@ -354,3 +354,4 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 client.login(config.token);
+// fixing bot attempt 1
