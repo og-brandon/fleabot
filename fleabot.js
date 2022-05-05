@@ -207,13 +207,22 @@ client.on("messageCreate", (message) => {
 	}
 
 	if (command === 'converttocelsius') {
-		const temperature = parseInt(messageArguments)
-		message.channel.send(fToC(temperature))
+		if (messageArguments === '') {
+			message.channel.send("Put a number dummy")
+		} else {
+			const temperature = parseInt(messageArguments)
+			message.channel.send(fToC(temperature))
+		}
+
 	}
 
-	if (command === 'converttofarenheit') {
-		const temperature = parseInt(messageArguments)
-		message.channel.send(cToF(temperature))
+	if (command === 'converttofahrenheit') {
+		if (messageArguments === '') {
+			message.channel.send("Put a number dummy")
+		} else {
+			const temperature = parseInt(messageArguments)
+			message.channel.send(cToF(temperature))
+		}
 	}
 })
 
