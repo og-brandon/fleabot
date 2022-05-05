@@ -119,6 +119,20 @@ client.once("ready", () => {
 // 	}
 //   });
 
+function cToF(celsius) {
+	var cTemp = celsius;
+	var cToFahr = cTemp * 9 / 5 + 32;
+	var message = cTemp + '\xB0C is ' + cToFahr + ' \xB0F.';
+	return message
+}
+
+function fToC(fahrenheit) {
+	var fTemp = fahrenheit;
+	var fToCel = (fTemp - 32) * 5 / 9;
+	var message = fTemp + '\xB0F is ' + fToCel + '\xB0C.';
+	return message
+}
+
 const prefix = '.'
 
 const wait = require("node:timers/promises").setTimeout;
@@ -133,12 +147,13 @@ client.on("messageCreate", (message) => {
 
 	let args = message.content.slice(prefix.length).trim().split(' ');
 	const command = args.shift().toLowerCase();
-	artistMessage = args.join(' ')
+	messageArguments = args.join(' ')
 
 	if (command === 'lyricstrivia') {
 		message.channel.sendTyping();
+		const embedColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
 		try {
-			lyricstrivia.getArtistID(artistMessage).then(artistID => {
+			lyricstrivia.getArtistID(messageArguments).then(artistID => {
 				lyricstrivia.getSongNameAndTitle(artistID).then(songChosen => {
 					lyricstrivia.getSongObject(songChosen.songTitle, songChosen.songArtist).then(songObject => {
 						let sectionSong;
@@ -149,7 +164,7 @@ client.on("messageCreate", (message) => {
 						}
 						try {
 							const songEmbed = new MessageEmbed()
-								.setColor("#ff0019")
+								.setColor(embedColor)
 								.setTitle('Guess this song from ' + songObject.artist)
 								.setDescription(sectionSong)
 								.setTimestamp()
@@ -159,7 +174,7 @@ client.on("messageCreate", (message) => {
 								});
 
 							const songSecondEmbed = new MessageEmbed()
-								.setColor("#ff0019")
+								.setColor(embedColor)
 								.setTitle(songObject.title)
 								.setDescription(songObject.title)
 								.setTimestamp()
@@ -173,7 +188,7 @@ client.on("messageCreate", (message) => {
 							setTimeout(() => { const msg2 = message.channel.send({ embeds: [songSecondEmbed] }) }, waitTimeBot);
 						} catch (error) {
 							const songSecondEmbed = new MessageEmbed()
-								.setColor("#ff0019")
+								.setColor(embedColor)
 								.setDescription("An error happened 😬")
 								.setTimestamp()
 
@@ -189,6 +204,16 @@ client.on("messageCreate", (message) => {
 			const msg = message.channel.send("An error happened 😬")
 		}
 
+	}
+
+	if (command === 'converttocelsius') {
+		const temperature = parseInt(messageArguments)
+		message.channel.send(fToC(temperature))
+	}
+
+	if (command === 'converttofarenheit') {
+		const temperature = parseInt(messageArguments)
+		message.channel.send(cToF(temperature))
 	}
 })
 
