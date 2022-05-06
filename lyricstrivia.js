@@ -114,7 +114,7 @@ function getSectionFromSongObject(songObject) {
   return songObject.lyrics.slice(position1, position2);
 }
 
-export async function getRandomSongSectionByArtist(messageArguments) {
+async function getRandomSongSectionByArtist(messageArguments) {
   try {
     await retry(async () => {
       logger.info(`Retrieving random song for message ${messageArguments}`);
@@ -158,3 +158,7 @@ export async function getRandomSongSectionByArtist(messageArguments) {
     return null;
   }
 }
+
+module.exports = {
+  getRandomSongSectionByArtist,
+};

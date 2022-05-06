@@ -1,6 +1,6 @@
 const { createLogger, format, transports } = require("winston");
 
-export const logger = createLogger({
+const logger = createLogger({
   level: "info",
   defaultMeta: { service: "fleabot" },
   transports: [
@@ -9,3 +9,7 @@ export const logger = createLogger({
     }),
   ],
 });
+
+module.exports = {
+  logger,
+};
