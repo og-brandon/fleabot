@@ -5,3 +5,5 @@ configserver.json
 keyfleabot.pem
 test.js
 .DS_Store
+.idea
+*.iml

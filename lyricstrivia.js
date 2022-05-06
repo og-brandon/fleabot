@@ -14,7 +14,7 @@ function nth_occurrence(string, char, nth) {
   var first_index = string.indexOf(char);
   var length_up_to_first_index = first_index + 1;
 
-  if (nth == 1) {
+  if (nth === 1) {
     return first_index;
   } else {
     var string_after_first_occurrence = string.slice(length_up_to_first_index);
@@ -38,7 +38,7 @@ async function getArtistID(artist) {
   const firstSong = searches[0];
   artistID = await firstSong.artist.id;
 
-  return artistID
+  return artistID;
 }
 
 // Choose a song title from the most popular 50 songs from given ID
@@ -46,42 +46,36 @@ async function getSongNameAndTitle(id) {
   const artist = await geniusClient.artists.get(id);
   const popularSongs = await artist.songs({
     perPage: 50,
-    sort: 'popularity'
+    sort: "popularity",
   });
-  const randomNumb = await getRandomInt(0, popularSongs.length)
-  const songChosen = await {
+  const randomNumb = await getRandomInt(0, popularSongs.length);
+  return {
     songTitle: popularSongs[randomNumb].title,
     songArtist: popularSongs[randomNumb].artist.name,
-  }
-
-  return songChosen
+  };
 }
 
 async function getSongObject(song, artist) {
-  const searches = await geniusClient.songs.search(song + ' ' + artist);
+  const searches = await geniusClient.songs.search(song + " " + artist);
 
   // Pick first one
   const chosenSong = searches[0];
 
   // Ok lets get the lyrics
   const songLyrics = await chosenSong.lyrics();
-	const songTitle = await chosenSong.title;
-	const songArt = await chosenSong.thumbnail;
-	const songUrl = await chosenSong.url;
-  const songArtist = artist
-
-  const songObject = await {
+  const songTitle = chosenSong.title;
+  const songArt = chosenSong.thumbnail;
+  const songUrl = chosenSong.url;
+  return {
     lyrics: songLyrics,
     title: songTitle,
     art: songArt,
     url: songUrl,
-    artist: songArtist
-  }
-
-  return songObject;
+    artist: artist,
+  };
 }
 
-function getSectionFromSongObject(songObject){
+function getSectionFromSongObject(songObject) {
   // purifies lyrics string a bit
   songObject.lyrics = songObject.lyrics.replace("]\n\n[", "");
   try {
@@ -89,12 +83,13 @@ function getSectionFromSongObject(songObject){
   } catch (error) {}
 
   // counts how many sections in the song with lyrics are there
-  var count = (songObject.lyrics.match(/]\n/g) || []).length;
+  const count = (songObject.lyrics.match(/]\n/g) || []).length;
 
-  randomSectionNumber = getRandomInt(0, count);
+  let randomSectionNumber = getRandomInt(0, count);
 
   // locates and slices section
-  let position1 = nth_occurrence(songObject.lyrics, "]\n", randomSectionNumber) + 1; // Plus one is needed to delete ']' character
+  let position1 =
+    nth_occurrence(songObject.lyrics, "]\n", randomSectionNumber) + 1; // Plus one is needed to delete ']' character
   let position2 = nth_occurrence(songObject.lyrics, "\n[", randomSectionNumber);
 
   sectionChosen = songObject.lyrics.slice(position1, position2);
@@ -102,13 +97,9 @@ function getSectionFromSongObject(songObject){
   return sectionChosen;
 }
 
-
-// getArtistID('Red Hot Chili Peppers').then(artistID => {
-//   getSongNameAndTitle(artistID).then(songChosen => {
-//     getSongObject(songChosen.songTitle, songChosen.songArtist).then(songObject => {
-//       console.log(getSectionFromSongObject(songObject))
-//     })
-//   })
-// })
-
-module.exports = { getArtistID, getSongNameAndTitle, getSongObject, getSectionFromSongObject};
+module.exports = {
+  getArtistID,
+  getSongNameAndTitle,
+  getSongObject,
+  getSectionFromSongObject,
+};
