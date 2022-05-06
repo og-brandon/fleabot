@@ -1,5 +1,5 @@
-import { logger } from "./logger";
-import retry from "async-retry";
+const logger = require("./logger");
+const retry = require("async-retry");
 
 const Genius = require("genius-lyrics");
 const fs = require("fs");
