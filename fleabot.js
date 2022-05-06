@@ -44,12 +44,12 @@ if (config.rhcp_twitter_toggle) {
   });
 
   t.on("error", function (err) {
-    console.log("Oh no");
+    logger.error(err);
   });
   let track = config.following;
   for (var i = 0; i < track.length; i++) {
     t.follow(track[i]);
-    console.log(`Following Twitter User [ID]${track[i]}`);
+    logger.info(`Following Twitter User [ID]${track[i]}`);
   }
 
   // twitter function
@@ -107,7 +107,7 @@ for (const file of commandFiles) {
 }
 
 client.once("ready", () => {
-  console.log("Flea is ready!");
+  logger.info("Flea is ready!");
 });
 
 // client.on("messageCreate", (message) => {
@@ -135,6 +135,7 @@ const waitTimeBot = waitTime * 1000;
 const waitTimeText = `Guess in ${waitTime} seconds!`;
 
 const lyricstrivia = require("./lyricstrivia");
+const { logger } = require("./logger");
 client.on("messageCreate", (message) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
@@ -146,60 +147,59 @@ client.on("messageCreate", (message) => {
     message.channel.sendTyping();
     const embedColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     try {
-      lyricstrivia.getArtistID(messageArguments).then((artistID) => {
-        lyricstrivia.getSongNameAndTitle(artistID).then((songChosen) => {
-          lyricstrivia
-            .getSongObject(songChosen.songTitle, songChosen.songArtist)
-            .then((songObject) => {
-              let sectionSong;
-              try {
-                sectionSong = lyricstrivia.getSectionFromSongObject(songObject);
-              } catch (error) {
-                console.log("error from section");
-              }
-              try {
-                const songEmbed = new MessageEmbed()
-                  .setColor(embedColor)
-                  .setTitle("Guess this song from " + songObject.artist)
-                  .setDescription(sectionSong)
-                  .setTimestamp()
-                  .setThumbnail(
-                    "https://ichef.bbci.co.uk/news/976/cpsprodpb/13F53/production/_83874718_thinkstockphotos-104548222.jpg"
-                  )
-                  .setFooter({
-                    text: "💿 " + waitTimeText,
-                  });
+      lyricstrivia
+        .getRandomSongSectionByArtist(messageArguments)
+        .then((sectionSong) => {
+          if (!sectionSong) {
+            message.channel.send(
+              "An error happened 😬 Please try again, it might work."
+            );
+            return;
+          }
 
-                const songSecondEmbed = new MessageEmbed()
-                  .setColor(embedColor)
-                  .setTitle(songObject.title)
-                  .setDescription(songObject.title)
-                  .setTimestamp()
-                  .setImage(songObject.art)
-                  .setURL(songObject.url)
-                  .setFooter({
-                    text: "💿 - " + songObject.artist,
-                  });
-                message.channel.send({ embeds: [songEmbed] });
-                setTimeout(() => {
-                  message.channel.send({
-                    embeds: [songSecondEmbed],
-                  });
-                }, waitTimeBot);
-              } catch (error) {
-                const songSecondEmbed = new MessageEmbed()
-                  .setColor(embedColor)
-                  .setDescription("An error happened 😬")
-                  .setTimestamp();
+          try {
+            const songEmbed = new MessageEmbed()
+              .setColor(embedColor)
+              .setTitle("Guess this song from " + songObject.artist)
+              .setDescription(sectionSong)
+              .setTimestamp()
+              .setThumbnail(
+                "https://ichef.bbci.co.uk/news/976/cpsprodpb/13F53/production/_83874718_thinkstockphotos-104548222.jpg"
+              )
+              .setFooter({
+                text: "💿 " + waitTimeText,
+              });
 
-                const msg = message.channel.send({ embeds: [songSecondEmbed] });
-              }
-            });
+            const songSecondEmbed = new MessageEmbed()
+              .setColor(embedColor)
+              .setTitle(songObject.title)
+              .setDescription(songObject.title)
+              .setTimestamp()
+              .setImage(songObject.art)
+              .setURL(songObject.url)
+              .setFooter({
+                text: "💿 - " + songObject.artist,
+              });
+            message.channel.send({ embeds: [songEmbed] });
+            setTimeout(() => {
+              message.channel.send({
+                embeds: [songSecondEmbed],
+              });
+            }, waitTimeBot);
+          } catch (error) {
+            const songSecondEmbed = new MessageEmbed()
+              .setColor(embedColor)
+              .setDescription("An error happened 😬")
+              .setTimestamp();
+
+            message.channel.send({ embeds: [songSecondEmbed] });
+          }
         });
-      });
     } catch (error) {
-      console.log(error);
-      const msg = message.channel.send("An error happened 😬");
+      logger.error(error);
+      message.channel.send(
+        "An error happened 😬 Please try again, it might work."
+      );
     }
   }
 
@@ -363,7 +363,7 @@ if (config.rhcp_subreddit_toggle) {
           });
         });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
     l;
   });
@@ -379,7 +379,7 @@ client.on("interactionCreate", async (interaction) => {
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     await interaction.reply({
       content: "There was an error while executing this command!",
       ephemeral: true,

@@ -1,3 +1,6 @@
+import { logger } from "./logger";
+import retry from "async-retry";
+
 const Genius = require("genius-lyrics");
 const fs = require("fs");
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
@@ -11,14 +14,16 @@ function getRandomInt(min, max) {
 
 // https://stackoverflow.com/questions/12744995/finding-the-nth-occurrence-of-a-character-in-a-string-in-javascript
 function nth_occurrence(string, char, nth) {
-  var first_index = string.indexOf(char);
-  var length_up_to_first_index = first_index + 1;
+  const first_index = string.indexOf(char);
+  const length_up_to_first_index = first_index + 1;
 
   if (nth === 1) {
     return first_index;
   } else {
-    var string_after_first_occurrence = string.slice(length_up_to_first_index);
-    var next_occurrence = nth_occurrence(
+    const string_after_first_occurrence = string.slice(
+      length_up_to_first_index
+    );
+    const next_occurrence = nth_occurrence(
       string_after_first_occurrence,
       char,
       nth - 1
@@ -32,22 +37,28 @@ function nth_occurrence(string, char, nth) {
   }
 }
 
-// Get ID from argument
 async function getArtistID(artist) {
   const searches = await geniusClient.songs.search(artist);
+  if (searches.length === 0) {
+    return null;
+  }
   const firstSong = searches[0];
-  artistID = await firstSong.artist.id;
-
-  return artistID;
+  return firstSong?.artist?.id;
 }
 
 // Choose a song title from the most popular 50 songs from given ID
-async function getSongNameAndTitle(id) {
-  const artist = await geniusClient.artists.get(id);
+async function getSongNameAndTitle(artistId) {
+  const artist = await geniusClient.artists.get(artistId);
+  if (!artist) {
+    return null;
+  }
   const popularSongs = await artist.songs({
     perPage: 50,
     sort: "popularity",
   });
+  if (!popularSongs || popularSongs.length === 0) {
+    return null;
+  }
   const randomNumb = await getRandomInt(0, popularSongs.length);
   return {
     songTitle: popularSongs[randomNumb].title,
@@ -57,6 +68,10 @@ async function getSongNameAndTitle(id) {
 
 async function getSongObject(song, artist) {
   const searches = await geniusClient.songs.search(song + " " + artist);
+
+  if (!searches || searches.length === 0) {
+    return null;
+  }
 
   // Pick first one
   const chosenSong = searches[0];
@@ -85,21 +100,61 @@ function getSectionFromSongObject(songObject) {
   // counts how many sections in the song with lyrics are there
   const count = (songObject.lyrics.match(/]\n/g) || []).length;
 
-  let randomSectionNumber = getRandomInt(0, count);
+  const randomSectionNumber = getRandomInt(0, count);
 
   // locates and slices section
-  let position1 =
+  const position1 =
     nth_occurrence(songObject.lyrics, "]\n", randomSectionNumber) + 1; // Plus one is needed to delete ']' character
-  let position2 = nth_occurrence(songObject.lyrics, "\n[", randomSectionNumber);
+  const position2 = nth_occurrence(
+    songObject.lyrics,
+    "\n[",
+    randomSectionNumber
+  );
 
-  sectionChosen = songObject.lyrics.slice(position1, position2);
-
-  return sectionChosen;
+  return songObject.lyrics.slice(position1, position2);
 }
 
-module.exports = {
-  getArtistID,
-  getSongNameAndTitle,
-  getSongObject,
-  getSectionFromSongObject,
-};
+export async function getRandomSongSectionByArtist(messageArguments) {
+  try {
+    await retry(async () => {
+      logger.info(`Retrieving random song for message ${messageArguments}`);
+      const artistId = await getArtistID(messageArguments);
+      if (!artistId) {
+        let msg = `No Artist ID for message ${messageArguments} found. Aborting or retrying...`;
+        logger.error(msg);
+        throw new Error(msg);
+      }
+      logger.info(`Artist ID for message ${messageArguments} is ${artistId}`);
+      const songChosen = await getSongNameAndTitle(artistId);
+      if (!songChosen) {
+        let msg = `No song found for Artist ID ${artistId}. Aborting or retrying...`;
+        logger.error(msg);
+        throw new Error(msg);
+      }
+      logger.info(
+        `Song title found for artist id ${artistId}: ${songChosen.songTitle}`
+      );
+      const songObject = getSongObject(
+        songChosen.songTitle,
+        songChosen.songArtist
+      );
+      if (!songObject) {
+        let msg = `No song object found for song title ${songChosen.songTitle}. Aborting or retrying...`;
+        logger.error(msg);
+        throw new Error(msg);
+      }
+      logger.info(`Retrieving section from song ${songChosen.songTitle}`);
+      let section = await getSectionFromSongObject(songObject);
+      if (!section) {
+        let msg = `No section found for song title ${songChosen.songTitle}. Aborting or retrying...`;
+        logger.error(msg);
+        throw new Error(msg);
+      }
+      return section;
+    });
+  } catch (e) {
+    logger.error("Retrieving songs failed for the last time");
+    logger.error(e);
+    return null;
+  }
+}
