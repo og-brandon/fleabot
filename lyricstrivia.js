@@ -1,4 +1,4 @@
-const logger = require("./logger");
+const { logger } = require("./logger");
 const retry = require("async-retry");
 
 const Genius = require("genius-lyrics");
@@ -115,8 +115,9 @@ function getSectionFromSongObject(songObject) {
 }
 
 async function getRandomSongSectionByArtist(messageArguments) {
+  logger.info(`Getting random song for message ${messageArguments}`);
   try {
-    await retry(async () => {
+    return await retry(async () => {
       logger.info(`Retrieving random song for message ${messageArguments}`);
       const artistId = await getArtistID(messageArguments);
       if (!artistId) {
