@@ -117,45 +117,52 @@ function getSectionFromSongObject(songObject) {
 async function getRandomSongSectionByArtist(messageArguments) {
   logger.info(`Getting random song for message ${messageArguments}`);
   try {
-    return await retry(async () => {
-      logger.info(`Retrieving random song for message ${messageArguments}`);
-      const artistId = await getArtistID(messageArguments);
-      if (!artistId) {
-        let msg = `No Artist ID for message ${messageArguments} found. Aborting or retrying...`;
-        logger.error(msg);
-        throw new Error(msg);
+    return await retry(
+      async () => {
+        logger.info(`Retrieving random song for message ${messageArguments}`);
+        const artistId = await getArtistID(messageArguments);
+        if (!artistId) {
+          let msg = `No Artist ID for message ${messageArguments} found. Aborting or retrying...`;
+          logger.error(msg);
+          throw new Error(msg);
+        }
+        logger.info(`Artist ID for message ${messageArguments} is ${artistId}`);
+        const songChosen = await getSongNameAndTitle(artistId);
+        if (!songChosen) {
+          let msg = `No song found for Artist ID ${artistId}. Aborting or retrying...`;
+          logger.error(msg);
+          throw new Error(msg);
+        }
+        logger.info(
+          `Song title found for artist id ${artistId}: ${songChosen.songTitle}`
+        );
+        const songObject = await getSongObject(
+          songChosen.songTitle,
+          songChosen.songArtist
+        );
+        if (!songObject) {
+          let msg = `No song object found for song title ${songChosen.songTitle}. Aborting or retrying...`;
+          logger.error(msg);
+          throw new Error(msg);
+        }
+        logger.info(`Retrieving section from song ${songChosen.songTitle}`);
+        let section = await getSectionFromSongObject(songObject);
+        if (!section) {
+          let msg = `No section found for song title ${songChosen.songTitle}. Aborting or retrying...`;
+          logger.error(msg);
+          throw new Error(msg);
+        }
+        return {
+          ...songObject,
+          section,
+        };
+      },
+      {
+        minTimeout: 100,
+        retries: 10,
+        factor: 1,
       }
-      logger.info(`Artist ID for message ${messageArguments} is ${artistId}`);
-      const songChosen = await getSongNameAndTitle(artistId);
-      if (!songChosen) {
-        let msg = `No song found for Artist ID ${artistId}. Aborting or retrying...`;
-        logger.error(msg);
-        throw new Error(msg);
-      }
-      logger.info(
-        `Song title found for artist id ${artistId}: ${songChosen.songTitle}`
-      );
-      const songObject = await getSongObject(
-        songChosen.songTitle,
-        songChosen.songArtist
-      );
-      if (!songObject) {
-        let msg = `No song object found for song title ${songChosen.songTitle}. Aborting or retrying...`;
-        logger.error(msg);
-        throw new Error(msg);
-      }
-      logger.info(`Retrieving section from song ${songChosen.songTitle}`);
-      let section = await getSectionFromSongObject(songObject);
-      if (!section) {
-        let msg = `No section found for song title ${songChosen.songTitle}. Aborting or retrying...`;
-        logger.error(msg);
-        throw new Error(msg);
-      }
-      return {
-        ...songObject,
-        section,
-      };
-    });
+    );
   } catch (e) {
     logger.error("Retrieving songs failed for the last time");
     logger.error(e);
