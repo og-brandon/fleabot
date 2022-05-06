@@ -135,7 +135,7 @@ async function getRandomSongSectionByArtist(messageArguments) {
       logger.info(
         `Song title found for artist id ${artistId}: ${songChosen.songTitle}`
       );
-      const songObject = getSongObject(
+      const songObject = await getSongObject(
         songChosen.songTitle,
         songChosen.songArtist
       );
@@ -151,7 +151,10 @@ async function getRandomSongSectionByArtist(messageArguments) {
         logger.error(msg);
         throw new Error(msg);
       }
-      return section;
+      return {
+        ...songObject,
+        section,
+      };
     });
   } catch (e) {
     logger.error("Retrieving songs failed for the last time");

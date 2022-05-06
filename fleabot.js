@@ -149,8 +149,8 @@ client.on("messageCreate", (message) => {
     try {
       lyricstrivia
         .getRandomSongSectionByArtist(messageArguments)
-        .then((sectionSong) => {
-          if (!sectionSong) {
+        .then((songObject) => {
+          if (!songObject) {
             message.channel.send(
               "An error happened 😬 Please try again, it might work."
             );
@@ -161,7 +161,7 @@ client.on("messageCreate", (message) => {
             const songEmbed = new MessageEmbed()
               .setColor(embedColor)
               .setTitle("Guess this song from " + songObject.artist)
-              .setDescription(sectionSong)
+              .setDescription(songObject.section)
               .setTimestamp()
               .setThumbnail(
                 "https://ichef.bbci.co.uk/news/976/cpsprodpb/13F53/production/_83874718_thinkstockphotos-104548222.jpg"
