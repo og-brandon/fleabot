@@ -43,22 +43,33 @@ async function getArtistID(artist) {
     return null;
   }
   const firstSong = searches[0];
-  return firstSong?.artist?.id;
+  const artistObject = {
+    artistId: firstSong.artist?.id,
+    artistName: firstSong?.artist?.name,
+  };
+  return artistObject;
 }
 
 // Choose a song title from the most popular 50 songs from given ID
-async function getSongNameAndTitle(artistId) {
-  const artist = await geniusClient.artists.get(artistId);
+async function getSongNameAndTitle(artistObject) {
+  const artist = await geniusClient.artists.get(artistObject.artistId);
   if (!artist) {
     return null;
   }
-  const popularSongs = await artist.songs({
+  let popularSongs = await artist.songs({
     perPage: 50,
     sort: "popularity",
   });
+
   if (!popularSongs || popularSongs.length === 0) {
     return null;
   }
+
+  popularSongs = await popularSongs.filter(
+    (song) =>
+      song.artist.name.toLowerCase() === artistObject.artistName.toLowerCase()
+  );
+
   const randomNumb = await getRandomInt(0, popularSongs.length);
   return {
     songTitle: popularSongs[randomNumb].title,
