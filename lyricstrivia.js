@@ -44,7 +44,7 @@ async function getArtistID(artist) {
   }
   const firstSong = searches[0];
   const artistObject = {
-    artistId: firstSong.artist?.id,
+    artistId: firstSong?.artist?.id,
     artistName: firstSong?.artist?.name,
   };
   return artistObject;
