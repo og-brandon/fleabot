@@ -56,24 +56,35 @@ async function getSongNameAndTitle(artistObject) {
   if (!artist) {
     return null;
   }
-  let popularSongs = await artist.songs({
-    perPage: 50,
-    sort: "popularity",
-  });
 
-  if (!popularSongs || popularSongs.length === 0) {
+  const totalPagesToLoad = 2;
+
+  const foundSongs = [];
+
+  // NOTE:
+  // I'm not sure what happens if you ask for a page that is out of bounds, e.g. when there is only one page for an artist
+  // Maybe it throws an error. In that case, you have to catch it of course
+  for (let pageIndex = 1; pageIndex <= totalPagesToLoad; pageIndex++) {
+    let popularSongs = await artist.songs({
+      perPage: 50,
+      sort: "popularity",
+      page: pageIndex,
+    });
+    let filteredByArtist = popularSongs.filter(
+      (song) =>
+        song.artist.name.toLowerCase() === artistObject.artistName.toLowerCase()
+    );
+    foundSongs.push(...filteredByArtist);
+  }
+
+  if (foundSongs.length === 0) {
     return null;
   }
 
-  popularSongs = await popularSongs.filter(
-    (song) =>
-      song.artist.name.toLowerCase() === artistObject.artistName.toLowerCase()
-  );
-
-  const randomNumb = await getRandomInt(0, popularSongs.length);
+  const randomNumb = await getRandomInt(0, foundSongs.length);
   return {
-    songTitle: popularSongs[randomNumb].title,
-    songArtist: popularSongs[randomNumb].artist.name,
+    songTitle: foundSongs[randomNumb].title,
+    songArtist: foundSongs[randomNumb].artist.name,
   };
 }
 
