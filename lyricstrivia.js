@@ -103,12 +103,14 @@ async function getSongObject(song, artist) {
   const songTitle = chosenSong.title;
   const songArt = chosenSong.thumbnail;
   const songUrl = chosenSong.url;
+  const songAlbum = chosenSong.album;
   return {
     lyrics: songLyrics,
     title: songTitle,
     art: songArt,
     url: songUrl,
     artist: artist,
+    album: songAlbum
   };
 }
 
