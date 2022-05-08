@@ -42,9 +42,9 @@ async function getArtistID(artist) {
   if (searches.length === 0) {
     return null;
   }
-  const firstSong = searches[1];
+  const firstSong = searches[getRandomInt(1-3)]; // max 10, coldplay returns coldplay and chainsmokers at 1 so we start at second entry.
   const artistObject = {
-    artistId: firstSong?.artist?.id,
+    artistId: firstSong.artist?.id,
     artistName: firstSong?.artist?.name,
   };
   return artistObject;
@@ -56,14 +56,14 @@ async function getSongNameAndTitle(artistObject) {
   if (!artist) {
     return null;
   }
-
-  const totalPagesToLoad = 2;
+  const totalPagesToLoad = 3;
 
   const foundSongs = [];
 
   // NOTE:
   // I'm not sure what happens if you ask for a page that is out of bounds, e.g. when there is only one page for an artist
   // Maybe it throws an error. In that case, you have to catch it of course
+  // R: returns empty array
   for (let pageIndex = 1; pageIndex <= totalPagesToLoad; pageIndex++) {
     let popularSongs = await artist.songs({
       perPage: 50,
