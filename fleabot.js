@@ -173,7 +173,6 @@ client.on("messageCreate", (message) => {
             const songSecondEmbed = new MessageEmbed()
               .setColor(embedColor)
               .setTitle(songObject.title)
-              .setDescription(songObject.album)
               .setTimestamp()
               .setImage(songObject.art)
               .setURL(songObject.url)
