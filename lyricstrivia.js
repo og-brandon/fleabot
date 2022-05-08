@@ -42,7 +42,7 @@ async function getArtistID(artist) {
   if (searches.length === 0) {
     return null;
   }
-  const firstSong = searches[getRandomInt(1-3)]; // max 10, coldplay returns coldplay and chainsmokers at 1 so we start at second entry.
+  const firstSong = searches[getRandomInt(1, 3)]; // max 10, coldplay returns coldplay and chainsmokers at 1 so we start at second entry.
   const artistObject = {
     artistId: firstSong.artist?.id,
     artistName: firstSong?.artist?.name,
