@@ -128,7 +128,7 @@ function fToC(fahrenheit) {
   return fTemp + "\xB0F is " + fToCel + "\xB0C.";
 }
 
-const prefix = ".";
+const prefix = "!";
 
 const waitTime = 15;
 const waitTimeBot = waitTime * 1000;
@@ -143,7 +143,7 @@ client.on("messageCreate", (message) => {
   const command = args.shift().toLowerCase();
   const messageArguments = args.join(" ");
 
-  if (command === "lyricstrivia") {
+  if (command === "lt") {
     message.channel.sendTyping();
     const embedColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     try {
