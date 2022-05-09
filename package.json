@@ -20,6 +20,7 @@
     "husky": "^7.0.4",
     "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
+    "ts-migrate": "^0.1.28",
     "winston": "^3.7.2"
   },
   "lint-staged": {
