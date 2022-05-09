@@ -24,6 +24,7 @@
     "husky": "^7.0.4",
     "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
+    "rimraf": "^3.0.2",
     "ts-migrate": "^0.1.28",
     "ts-node": "^10.7.0",
     "tsc-watch": "^5.0.3",
@@ -37,6 +38,7 @@
   "scripts": {
     "prepare": "husky install",
     "dev-fleabot": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/fleabot.js\"",
-    "dev-deploy-commands": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/deploy-commands.js\""
+    "dev-deploy-commands": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/deploy-commands.js\"",
+    "build": "rimraf ./dist && tsc"
   }
 }
