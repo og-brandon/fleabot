@@ -143,7 +143,7 @@ client.on("messageCreate", (message) => {
   const command = args.shift().toLowerCase();
   const messageArguments = args.join(" ");
 
-  if (command === "lt") {
+  if (command === "lt" || command === "lyricstrivia") {
     message.channel.sendTyping();
     const embedColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     try {
