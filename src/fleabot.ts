@@ -127,23 +127,13 @@ client.once("ready", () => {
 // 	}
 //   });
 
-function cToF(celsius: any) {
-  const cTemp = celsius;
-  const cToFahr = (cTemp * 9) / 5 + 32;
-  return cTemp + "\xB0C is " + cToFahr + " \xB0F.";
-}
-
-function fToC(fahrenheit: any) {
-  const fTemp = fahrenheit;
-  const fToCel = ((fTemp - 32) * 5) / 9;
-  return fTemp + "\xB0F is " + fToCel + "\xB0C.";
-}
-
 const prefix = "!";
 
 const waitTime = 15;
 const waitTimeBot = waitTime * 1000;
 const waitTimeText = `Guess in ${waitTime} seconds!`;
+
+import { cToF, fToC } from "./utils";
 import { getRandomSongSectionByArtist } from "./lyricstrivia";
 
 client.on("messageCreate", (message: any) => {
@@ -212,7 +202,7 @@ client.on("messageCreate", (message: any) => {
     }
   }
 
-  if (command === "converttocelsius") {
+  if (command === "converttocelsius" || command === "ftc") {
     if (messageArguments === "") {
       message.channel.send("Put a number dummy");
     } else {
@@ -221,7 +211,7 @@ client.on("messageCreate", (message: any) => {
     }
   }
 
-  if (command === "converttofahrenheit") {
+  if (command === "converttofahrenheit" || command === "ctf") {
     if (messageArguments === "") {
       message.channel.send("Put a number dummy");
     } else {

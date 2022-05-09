@@ -27,3 +27,17 @@ export function getRandomInt(min: any, max: any) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export function cToF(celsius: any) {
+  const cTemp = celsius;
+  const cToFahr = (cTemp * 9) / 5 + 32;
+  const rounded = Math.round(cToFahr * 10) / 10
+  return cTemp + "\xB0C is " + rounded + " \xB0F.";
+}
+
+export function fToC(fahrenheit: any) {
+  const fTemp = fahrenheit;
+  const fToCel = ((fTemp - 32) * 5) / 9;
+  const rounded = Math.round(fToCel * 10) / 10
+  return fTemp + "\xB0F is " + rounded + "\xB0C.";
+}
