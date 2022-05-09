@@ -1,16 +1,45 @@
-import { Client, Collection, HexColorString, MessageEmbed } from "discord.js";
+import {
+  Collection,
+  HexColorString,
+  Interaction,
+  MessageEmbed,
+} from "discord.js";
 import fetch from "node-fetch";
 import Twit from "node-tweet-stream";
 import fs from "fs";
 import decodeN from "html-entities";
 import { logger } from "./logger";
 import cron from "node-cron";
+import { cToF, fToC, client } from "./utils";
+import { getRandomSongSectionByArtist } from "./lyricstrivia";
 
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
-// https://github.com/otherwisee/DiscordTwitterBot thanks for twitter guide
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v9";
+const { clientId, token } = require("../config.json");
 
-const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
+const commands = [];
+const commandFiles = fs
+    .readdirSync(`${__dirname}/commands`)
+    .filter((file: any) => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+  const command = require(`${__dirname}/commands/${file}`);
+  commands.push(command.default.data.toJSON());
+}
+
+const rest = new REST({ version: "9" }).setToken(token);
+
+rest
+    .put(Routes.applicationCommands(clientId), { body: commands })
+    .then(() => {
+      return logger.info("Successfully registered application commands.");
+    })
+    .catch(console.error);
+
+
+// https://github.com/otherwisee/DiscordTwitterBot thanks for twitter guide
 
 const rhcpURL = "https://www.reddit.com/r/RedHotChiliPeppers/new.json?t=hour";
 
@@ -105,10 +134,6 @@ if (config.rhcp_twitter_toggle) {
 // @ts-ignore
 client.commands = new Collection();
 
-const commandFiles = fs
-  .readdirSync(`${__dirname}/commands`)
-  .filter((file: any) => file.endsWith(".js"));
-
 for (const file of commandFiles) {
   const command = require(`${__dirname}/commands/${file}`);
   // Set a new item in the Collection
@@ -132,9 +157,6 @@ const prefix = "!";
 const waitTime = 15;
 const waitTimeBot = waitTime * 1000;
 const waitTimeText = `Guess in ${waitTime} seconds!`;
-
-import { cToF, fToC } from "./utils";
-import { getRandomSongSectionByArtist } from "./lyricstrivia";
 
 client.on("messageCreate", (message: any) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -374,7 +396,7 @@ if (config.rhcp_subreddit_toggle) {
   });
 }
 
-client.on("interactionCreate", async (interaction: any) => {
+client.on("interactionCreate", async (interaction: Interaction) => {
   if (!interaction.isCommand()) return;
 
   // @ts-ignore
@@ -393,5 +415,4 @@ client.on("interactionCreate", async (interaction: any) => {
   }
 });
 
-client.login(config.token);
 // fixing bot attempt 1

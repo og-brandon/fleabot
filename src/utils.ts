@@ -1,3 +1,13 @@
+import {Client} from "discord.js";
+import fs from "fs";
+
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
+
+const discordClient = new Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
+discordClient.login(config.token);
+
+export const client = discordClient;
+
 export function nth_occurrence(string: any, char: any, nth: any): number {
   const first_index = string.indexOf(char);
   const length_up_to_first_index = first_index + 1;
