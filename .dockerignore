@@ -1,5 +1,10 @@
-lyrics-pull
+.github
+.husky
+dist
+node_modules
 readme
 readme.md
-*.iml
 .gitignore
+config.json
+tsconfig.json
+*.iml

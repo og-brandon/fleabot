@@ -1,24 +1,25 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
-const wait = require("node:timers/promises").setTimeout;
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { MessageEmbed } from "discord.js";
+import { setTimeout } from "node:timers/promises";
+import { getRandomInt, nth_occurrence } from "../utils";
 
-const waitTime = 15
-const waitTimeBot = waitTime * 1000
-const waitTimeText = `Guess in ${waitTime} seconds!`
+import rhcpJSON from "./rhcplyrics.json";
 
-module.exports = {
+const waitTime = 15;
+const waitTimeBot = waitTime * 1000;
+const waitTimeText = `Guess in ${waitTime} seconds!`;
+
+export default {
   data: new SlashCommandBuilder()
     .setName("lyrics")
     .setDescription("Guess which song it is based on the lyrics!"),
-  async execute(interaction) {
-    const rhcpJSON = require("./rhcplyrics.json");
-
+  async execute(interaction: any) {
     const songRandomNumber = getRandomInt(0, rhcpJSON.length - 1);
 
-    songLyrics = rhcpJSON[songRandomNumber]["lyrics"];
-    songTitle = rhcpJSON[songRandomNumber]["title"];
-    songArt = rhcpJSON[songRandomNumber]["art"];
-    songUrl = rhcpJSON[songRandomNumber]["url"];
+    let songLyrics = rhcpJSON[songRandomNumber]["lyrics"];
+    const songTitle = rhcpJSON[songRandomNumber]["title"];
+    const songArt = rhcpJSON[songRandomNumber]["art"];
+    const songUrl = rhcpJSON[songRandomNumber]["url"];
 
     // purifies lyrics string a bit
     songLyrics = songLyrics.replace("]\n\n[", "");
@@ -27,15 +28,15 @@ module.exports = {
     } catch (error) {}
 
     // counts how many sections in the song with lyrics are there
-    var count = (songLyrics.match(/]\n/g) || []).length;
+    const count = (songLyrics.match(/]\n/g) || []).length;
 
-    randomSectionNumber = getRandomInt(0, count);
+    const randomSectionNumber = getRandomInt(0, count);
 
     // locates and slices section
     let position1 = nth_occurrence(songLyrics, "]\n", randomSectionNumber) + 1; // Plus one is needed to delete ']' character
     let position2 = nth_occurrence(songLyrics, "\n[", randomSectionNumber);
 
-    sectionChosen = songLyrics.slice(position1, position2);
+    const sectionChosen = songLyrics.slice(position1, position2);
 
     // console.log('Song:'+songTitle+'--------------'+sectionChosen+'---------------')
 
@@ -72,36 +73,7 @@ module.exports = {
       });
 
     await interaction.reply({ embeds: [firstReplyEmbed] });
-    await wait(waitTimeBot);
+    await setTimeout(waitTimeBot);
     await interaction.editReply({ embeds: [secondReplyEmbed] });
   },
 };
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// https://stackoverflow.com/questions/12744995/finding-the-nth-occurrence-of-a-character-in-a-string-in-javascript
-function nth_occurrence(string, char, nth) {
-  var first_index = string.indexOf(char);
-  var length_up_to_first_index = first_index + 1;
-
-  if (nth == 1) {
-    return first_index;
-  } else {
-    var string_after_first_occurrence = string.slice(length_up_to_first_index);
-    var next_occurrence = nth_occurrence(
-      string_after_first_occurrence,
-      char,
-      nth - 1
-    );
-
-    if (next_occurrence === -1) {
-      return -1;
-    } else {
-      return length_up_to_first_index + next_occurrence;
-    }
-  }
-}

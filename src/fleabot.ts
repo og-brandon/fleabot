@@ -1,9 +1,10 @@
-const { Client, Collection, Intents } = require("discord.js");
-const fetch = require("node-fetch");
-const { MessageEmbed } = require("discord.js");
-const Twit = require("node-tweet-stream");
-const fs = require("fs");
-const decodeN = require("html-entities");
+import { Client, Collection, HexColorString, MessageEmbed } from "discord.js";
+import fetch from "node-fetch";
+import Twit from "node-tweet-stream";
+import fs from "fs";
+import decodeN from "html-entities";
+import { logger } from "./logger";
+import cron from "node-cron";
 
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
@@ -26,8 +27,8 @@ const t = new Twit({
 
 // Tweet Listener + Post
 if (config.rhcp_twitter_toggle) {
-  t.on("tweet", function (tweet) {
-    if (isReply(tweet) === true) {
+  t.on("tweet", function (tweet: any) {
+    if (isReply(tweet)) {
       //
     } else {
       let media = tweet.entities.media;
@@ -43,7 +44,7 @@ if (config.rhcp_twitter_toggle) {
     }
   });
 
-  t.on("error", function (err) {
+  t.on("error", function (err: any) {
     logger.error(err);
   });
   let track = config.following;
@@ -53,7 +54,7 @@ if (config.rhcp_twitter_toggle) {
   }
 
   // twitter function
-  function isReply(tweet) {
+  function isReply(tweet: any) {
     return !!(
       tweet.retweeted_status ||
       tweet.in_reply_to_status_id ||
@@ -64,7 +65,14 @@ if (config.rhcp_twitter_toggle) {
     );
   }
 
-  function chatPost(content, author, atAuthor, tweetURL, authorPfp, media) {
+  function chatPost(
+    content: any,
+    author: any,
+    atAuthor: any,
+    tweetURL: any,
+    authorPfp: any,
+    media: any
+  ) {
     const authorTweet = author + " @" + atAuthor;
     const message = new MessageEmbed()
       .setColor("#00acee")
@@ -86,7 +94,7 @@ if (config.rhcp_twitter_toggle) {
       for (let j = 0; j < media.length; j++)
         message.setImage(media[j].media_url);
 
-    for (const __channel of config.twitter_channel.map((x) =>
+    for (const __channel of config.twitter_channel.map((x: any) =>
       client.channels.cache.get(x)
     ))
       __channel.send({ embeds: [message] });
@@ -94,16 +102,19 @@ if (config.rhcp_twitter_toggle) {
 }
 // -------------------------------
 
+// @ts-ignore
 client.commands = new Collection();
+
 const commandFiles = fs
-  .readdirSync("./commands")
-  .filter((file) => file.endsWith(".js"));
+  .readdirSync(`${__dirname}/commands`)
+  .filter((file: any) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+  const command = require(`${__dirname}/commands/${file}`);
   // Set a new item in the Collection
   // With the key as the command name and the value as the exported module
-  client.commands.set(command.data.name, command);
+  // @ts-ignore
+  client.commands.set(command.default.data.name, command);
 }
 
 client.once("ready", () => {
@@ -116,13 +127,13 @@ client.once("ready", () => {
 // 	}
 //   });
 
-function cToF(celsius) {
+function cToF(celsius: any) {
   const cTemp = celsius;
   const cToFahr = (cTemp * 9) / 5 + 32;
   return cTemp + "\xB0C is " + cToFahr + " \xB0F.";
 }
 
-function fToC(fahrenheit) {
+function fToC(fahrenheit: any) {
   const fTemp = fahrenheit;
   const fToCel = ((fTemp - 32) * 5) / 9;
   return fTemp + "\xB0F is " + fToCel + "\xB0C.";
@@ -133,10 +144,9 @@ const prefix = "!";
 const waitTime = 15;
 const waitTimeBot = waitTime * 1000;
 const waitTimeText = `Guess in ${waitTime} seconds!`;
+import { getRandomSongSectionByArtist } from "./lyricstrivia";
 
-const lyricstrivia = require("./lyricstrivia");
-const { logger } = require("./logger");
-client.on("messageCreate", (message) => {
+client.on("messageCreate", (message: any) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   let args = message.content.slice(prefix.length).trim().split(" ");
@@ -145,55 +155,55 @@ client.on("messageCreate", (message) => {
 
   if (command === "lt" || command === "lyricstrivia") {
     message.channel.sendTyping();
-    const embedColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+    const embedColor: HexColorString = `#${Math.floor(
+      Math.random() * 16777215
+    ).toString(16)}`;
     try {
-      lyricstrivia
-        .getRandomSongSectionByArtist(messageArguments)
-        .then((songObject) => {
-          if (!songObject) {
-            message.channel.send(
-              "An error happened 😬 Please try again, it might work."
-            );
-            return;
-          }
+      getRandomSongSectionByArtist(messageArguments).then((songObject: any) => {
+        if (!songObject) {
+          message.channel.send(
+            "An error happened 😬 Please try again, it might work."
+          );
+          return;
+        }
 
-          try {
-            const songEmbed = new MessageEmbed()
-              .setColor(embedColor)
-              .setTitle("Guess this song from " + songObject.artist)
-              .setDescription(songObject.section)
-              .setTimestamp()
-              .setThumbnail(
-                "https://ichef.bbci.co.uk/news/976/cpsprodpb/13F53/production/_83874718_thinkstockphotos-104548222.jpg"
-              )
-              .setFooter({
-                text: "💿 " + waitTimeText,
-              });
+        try {
+          const songEmbed = new MessageEmbed()
+            .setColor(embedColor)
+            .setTitle("Guess this song from " + songObject.artist)
+            .setDescription(songObject.section)
+            .setTimestamp()
+            .setThumbnail(
+              "https://ichef.bbci.co.uk/news/976/cpsprodpb/13F53/production/_83874718_thinkstockphotos-104548222.jpg"
+            )
+            .setFooter({
+              text: "💿 " + waitTimeText,
+            });
 
-            const songSecondEmbed = new MessageEmbed()
-              .setColor(embedColor)
-              .setTitle(songObject.title)
-              .setTimestamp()
-              .setImage(songObject.art)
-              .setURL(songObject.url)
-              .setFooter({
-                text: "💿 - " + songObject.artist,
-              });
-            message.channel.send({ embeds: [songEmbed] });
-            setTimeout(() => {
-              message.channel.send({
-                embeds: [songSecondEmbed],
-              });
-            }, waitTimeBot);
-          } catch (error) {
-            const songSecondEmbed = new MessageEmbed()
-              .setColor(embedColor)
-              .setDescription("An error happened 😬, try again!")
-              .setTimestamp();
+          const songSecondEmbed = new MessageEmbed()
+            .setColor(embedColor)
+            .setTitle(songObject.title)
+            .setTimestamp()
+            .setImage(songObject.art)
+            .setURL(songObject.url)
+            .setFooter({
+              text: "💿 - " + songObject.artist,
+            });
+          message.channel.send({ embeds: [songEmbed] });
+          setTimeout(() => {
+            message.channel.send({
+              embeds: [songSecondEmbed],
+            });
+          }, waitTimeBot);
+        } catch (error) {
+          const songSecondEmbed = new MessageEmbed()
+            .setColor(embedColor)
+            .setDescription("An error happened 😬, try again!")
+            .setTimestamp();
 
-            message.channel.send({ embeds: [songSecondEmbed] });
-          }
-        });
+          message.channel.send({ embeds: [songSecondEmbed] });
+        }
+      });
     } catch (error) {
       logger.error(error);
       message.channel.send(
@@ -221,14 +231,19 @@ client.on("messageCreate", (message) => {
   }
 });
 
+type Post = {
+  title: string;
+  reddit_url: string;
+  media_url: string;
+  is_spoiler: string;
+  thumbnail_image: string;
+  user: string;
+  self: string;
+};
 if (config.rhcp_subreddit_toggle) {
-  //fetch reddit posts via cron every minute
-  const cron = require("node-cron");
-  const pass = require("./commands/pass");
-
   cron.schedule("* * * * *", () => {
     try {
-      let postsDate = [];
+      let postsDate: number[] = [];
 
       fetch(rhcpURL)
         .then((response) => response.json())
@@ -238,20 +253,22 @@ if (config.rhcp_subreddit_toggle) {
           for (var i = 0; i < postsJSON["data"]["children"].length; i++) {
             const utc_post =
               postsJSON["data"]["children"][i]["data"]["created_utc"];
-            seconds_since = subredditDate - utc_post;
+            const seconds_since = subredditDate - utc_post;
             postsDate.push(seconds_since);
           }
 
           // returns list with indexes of new posts last minute
-          const postsIndexes = postsDate.reduce(function (arr, e, i) {
+          const postsIndexes = postsDate.reduce((arr, e, i) => {
             if (e <= 62) arr.push(i);
             return arr;
-          }, []);
+          }, [] as number[]);
 
-          let lastMinutePosts = [];
+          let lastMinutePosts: Post[] = [];
 
-          postsIndexes.forEach((i) => {
-            dictionary_to_push = {
+          let post: Post | null = null;
+
+          postsIndexes.forEach((i: any) => {
+            post = {
               title: decodeN.decode(
                 postsJSON["data"]["children"][i]["data"]["title"].substring(
                   0,
@@ -274,20 +291,21 @@ if (config.rhcp_subreddit_toggle) {
               ),
             };
 
-            if (!dictionary_to_push.thumbnail_image.startsWith("http")) {
-              dictionary_to_push.thumbnail_image =
+            if (!post.thumbnail_image.startsWith("http")) {
+              post.thumbnail_image =
                 "https://github.com/og-brandon/fleabot/blob/master/images/snoo.png?raw=true";
             }
 
             // replaces cases where self posts is just preview link broken
-            if (dictionary_to_push.self.startsWith("&amp")) {
-              dictionary_to_push.media_url = Object.values(
+            if (post.self.startsWith("&amp")) {
+              // @ts-ignore
+              post.media_url = Object.values(
                 postsJSON["data"]["children"][0]["data"]["media_metadata"]
               )[0]["p"][0]["u"].replace("preview", "i");
-              dictionary_to_push.self = "";
+              post.self = "";
             }
 
-            lastMinutePosts.push(dictionary_to_push);
+            lastMinutePosts.push(post);
           });
 
           const channel = client.channels.cache.get(
@@ -321,9 +339,7 @@ if (config.rhcp_subreddit_toggle) {
               );
             }
             // if thumbnails is spoiler
-            else if (
-              dictionary_to_push.media_url.startsWith("http") === false
-            ) {
+            else if (post?.media_url?.startsWith("http") === false) {
               subredditEmbed.setThumbnail(
                 "https://github.com/og-brandon/fleabot/blob/master/images/snoo.png?raw=true"
               );
@@ -352,31 +368,32 @@ if (config.rhcp_subreddit_toggle) {
               );
             }
 
-            if (post.thumbnail_image.startsWith("http") === false) {
+            if (!post.thumbnail_image.startsWith("http")) {
               subredditEmbed.setThumbnail(
                 "https://github.com/og-brandon/fleabot/blob/master/images/snoo.png?raw=true"
               );
             }
 
-            channel.send({ embeds: [subredditEmbed] });
+            // @ts-ignore
+            channel?.send({ embeds: [subredditEmbed] });
           });
         });
     } catch (error) {
       logger.error(error);
     }
-    l;
   });
 }
 
-client.on("interactionCreate", async (interaction) => {
+client.on("interactionCreate", async (interaction: any) => {
   if (!interaction.isCommand()) return;
 
+  // @ts-ignore
   const command = client.commands.get(interaction.commandName);
 
   if (!command) return;
 
   try {
-    await command.execute(interaction);
+    await command.default.execute(interaction);
   } catch (error) {
     logger.error(error);
     await interaction.reply({

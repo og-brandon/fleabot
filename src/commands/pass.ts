@@ -1,11 +1,11 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { MessageEmbed } from "discord.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("passdown")
     .setDescription("Pass down the stratocaster!"),
-  async execute(interaction) {
+  async execute(interaction: any) {
     const passEmbed = new MessageEmbed()
       .setTitle("Pass the Stratocaster down")
       .setColor("#ff0019")
