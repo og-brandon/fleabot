@@ -1,47 +1,11 @@
-// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'logger'.
-const { logger } = require("./logger");
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const retry = require("async-retry");
+import { logger } from "./logger";
+import retry from "async-retry";
+import { Client } from "genius-lyrics";
+import fs from "fs";
+import { getRandomInt, nth_occurrence } from "./utils";
 
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const Genius = require("genius-lyrics");
-// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fs'.
-const fs = require("fs");
-// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'config'.
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
-const geniusClient = new Genius.Client(config.geniusToken);
-
-function getRandomInt(min: any, max: any) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// https://stackoverflow.com/questions/12744995/finding-the-nth-occurrence-of-a-character-in-a-string-in-javascript
-// @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
-function nth_occurrence(string: any, char: any, nth: any) {
-  const first_index = string.indexOf(char);
-  const length_up_to_first_index = first_index + 1;
-
-  if (nth === 1) {
-    return first_index;
-  } else {
-    const string_after_first_occurrence = string.slice(
-      length_up_to_first_index
-    );
-    const next_occurrence = nth_occurrence(
-      string_after_first_occurrence,
-      char,
-      nth - 1
-    );
-
-    if (next_occurrence === -1) {
-      return -1;
-    } else {
-      return length_up_to_first_index + next_occurrence;
-    }
-  }
-}
+const geniusClient = new Client(config.geniusToken);
 
 async function getArtistID(artist: any) {
   const searches = await geniusClient.songs.search(artist);
@@ -49,11 +13,10 @@ async function getArtistID(artist: any) {
     return null;
   }
   const firstSong = searches[getRandomInt(1, 3)]; // max 10, coldplay returns coldplay and chainsmokers at 1 so we start at second entry.
-  const artistObject = {
+  return {
     artistId: firstSong.artist?.id,
     artistName: firstSong?.artist?.name,
   };
-  return artistObject;
 }
 
 // Choose a song title from the most popular 50 songs from given ID
@@ -66,10 +29,6 @@ async function getSongNameAndTitle(artistObject: any) {
 
   const foundSongs = [];
 
-  // NOTE:
-  // I'm not sure what happens if you ask for a page that is out of bounds, e.g. when there is only one page for an artist
-  // Maybe it throws an error. In that case, you have to catch it of course
-  // R: returns empty array
   for (let pageIndex = 1; pageIndex <= totalPagesToLoad; pageIndex++) {
     let popularSongs = await artist.songs({
       perPage: 50,
@@ -77,10 +36,11 @@ async function getSongNameAndTitle(artistObject: any) {
       page: pageIndex,
     });
     let filteredByArtist = popularSongs.filter(
-      (song: any) => song.artist.name.toLowerCase() === artistObject.artistName.toLowerCase()
+      (song: any) =>
+        song.artist.name.toLowerCase() === artistObject.artistName.toLowerCase()
     );
     foundSongs.push(...filteredByArtist);
-    if(foundSongs.length >= 30){
+    if (foundSongs.length >= 30) {
       break;
     }
   }
@@ -144,7 +104,7 @@ function getSectionFromSongObject(songObject: any) {
   return songObject.lyrics.slice(position1, position2);
 }
 
-async function getRandomSongSectionByArtist(messageArguments: any) {
+export async function getRandomSongSectionByArtist(messageArguments: any) {
   logger.info(`Getting random song for message ${messageArguments}`);
   try {
     return await retry(
@@ -156,7 +116,9 @@ async function getRandomSongSectionByArtist(messageArguments: any) {
           logger.error(msg);
           throw new Error(msg);
         }
-        logger.info(`Artist ID for message ${messageArguments} is ${artistId.artistId}`);
+        logger.info(
+          `Artist ID for message ${messageArguments} is ${artistId.artistId}`
+        );
         const songChosen = await getSongNameAndTitle(artistId);
         if (!songChosen) {
           let msg = `No song found for Artist ID ${artistId.artistId}. Aborting or retrying...`;
@@ -199,8 +161,3 @@ async function getRandomSongSectionByArtist(messageArguments: any) {
     return null;
   }
 }
-
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = {
-  getRandomSongSectionByArtist,
-};
