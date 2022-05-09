@@ -148,15 +148,15 @@ async function getRandomSongSectionByArtist(messageArguments) {
           logger.error(msg);
           throw new Error(msg);
         }
-        logger.info(`Artist ID for message ${messageArguments} is ${artistId}`);
+        logger.info(`Artist ID for message ${messageArguments} is ${artistId.artistId}`);
         const songChosen = await getSongNameAndTitle(artistId);
         if (!songChosen) {
-          let msg = `No song found for Artist ID ${artistId}. Aborting or retrying...`;
+          let msg = `No song found for Artist ID ${artistId.artistId}. Aborting or retrying...`;
           logger.error(msg);
           throw new Error(msg);
         }
         logger.info(
-          `Song title found for artist id ${artistId}: ${songChosen.songTitle}`
+          `Song title found for artist id ${artistId.artistId}: ${songChosen.songTitle}`
         );
         const songObject = await getSongObject(
           songChosen.songTitle,
