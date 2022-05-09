@@ -75,6 +75,9 @@ async function getSongNameAndTitle(artistObject) {
         song.artist.name.toLowerCase() === artistObject.artistName.toLowerCase()
     );
     foundSongs.push(...filteredByArtist);
+    if(foundSongs.length >= 30){
+      break;
+    }
   }
 
   if (foundSongs.length === 0) {
