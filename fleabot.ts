@@ -1,10 +1,17 @@
+// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const { Client, Collection, Intents } = require("discord.js");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fetch'.
 const fetch = require("node-fetch");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'MessageEmb... Remove this comment to see the full error message
 const { MessageEmbed } = require("discord.js");
+// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const Twit = require("node-tweet-stream");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fs'.
 const fs = require("fs");
+// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const decodeN = require("html-entities");
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'config'.
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
 // https://github.com/otherwisee/DiscordTwitterBot thanks for twitter guide
@@ -26,7 +33,7 @@ const t = new Twit({
 
 // Tweet Listener + Post
 if (config.rhcp_twitter_toggle) {
-  t.on("tweet", function (tweet) {
+  t.on("tweet", function (tweet: any) {
     if (isReply(tweet) === true) {
       //
     } else {
@@ -43,7 +50,7 @@ if (config.rhcp_twitter_toggle) {
     }
   });
 
-  t.on("error", function (err) {
+  t.on("error", function (err: any) {
     logger.error(err);
   });
   let track = config.following;
@@ -53,7 +60,7 @@ if (config.rhcp_twitter_toggle) {
   }
 
   // twitter function
-  function isReply(tweet) {
+  function isReply(tweet: any) {
     return !!(
       tweet.retweeted_status ||
       tweet.in_reply_to_status_id ||
@@ -64,7 +71,7 @@ if (config.rhcp_twitter_toggle) {
     );
   }
 
-  function chatPost(content, author, atAuthor, tweetURL, authorPfp, media) {
+  function chatPost(content: any, author: any, atAuthor: any, tweetURL: any, authorPfp: any, media: any) {
     const authorTweet = author + " @" + atAuthor;
     const message = new MessageEmbed()
       .setColor("#00acee")
@@ -86,8 +93,7 @@ if (config.rhcp_twitter_toggle) {
       for (let j = 0; j < media.length; j++)
         message.setImage(media[j].media_url);
 
-    for (const __channel of config.twitter_channel.map((x) =>
-      client.channels.cache.get(x)
+    for (const __channel of config.twitter_channel.map((x: any) => client.channels.cache.get(x)
     ))
       __channel.send({ embeds: [message] });
   }
@@ -95,11 +101,13 @@ if (config.rhcp_twitter_toggle) {
 // -------------------------------
 
 client.commands = new Collection();
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'commandFil... Remove this comment to see the full error message
 const commandFiles = fs
   .readdirSync("./commands")
-  .filter((file) => file.endsWith(".js"));
+  .filter((file: any) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
+  // @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   const command = require(`./commands/${file}`);
   // Set a new item in the Collection
   // With the key as the command name and the value as the exported module
@@ -116,13 +124,13 @@ client.once("ready", () => {
 // 	}
 //   });
 
-function cToF(celsius) {
+function cToF(celsius: any) {
   const cTemp = celsius;
   const cToFahr = (cTemp * 9) / 5 + 32;
   return cTemp + "\xB0C is " + cToFahr + " \xB0F.";
 }
 
-function fToC(fahrenheit) {
+function fToC(fahrenheit: any) {
   const fTemp = fahrenheit;
   const fToCel = ((fTemp - 32) * 5) / 9;
   return fTemp + "\xB0F is " + fToCel + "\xB0C.";
@@ -130,13 +138,18 @@ function fToC(fahrenheit) {
 
 const prefix = "!";
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'waitTime'.
 const waitTime = 15;
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'waitTimeBo... Remove this comment to see the full error message
 const waitTimeBot = waitTime * 1000;
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'waitTimeTe... Remove this comment to see the full error message
 const waitTimeText = `Guess in ${waitTime} seconds!`;
 
+// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const lyricstrivia = require("./lyricstrivia");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'logger'.
 const { logger } = require("./logger");
-client.on("messageCreate", (message) => {
+client.on("messageCreate", (message: any) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   let args = message.content.slice(prefix.length).trim().split(" ");
@@ -149,7 +162,7 @@ client.on("messageCreate", (message) => {
     try {
       lyricstrivia
         .getRandomSongSectionByArtist(messageArguments)
-        .then((songObject) => {
+        .then((songObject: any) => {
           if (!songObject) {
             message.channel.send(
               "An error happened 😬 Please try again, it might work."
@@ -223,12 +236,14 @@ client.on("messageCreate", (message) => {
 
 if (config.rhcp_subreddit_toggle) {
   //fetch reddit posts via cron every minute
+  // @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   const cron = require("node-cron");
+  // @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   const pass = require("./commands/pass");
 
   cron.schedule("* * * * *", () => {
     try {
-      let postsDate = [];
+      let postsDate: any = [];
 
       fetch(rhcpURL)
         .then((response) => response.json())
@@ -238,19 +253,23 @@ if (config.rhcp_subreddit_toggle) {
           for (var i = 0; i < postsJSON["data"]["children"].length; i++) {
             const utc_post =
               postsJSON["data"]["children"][i]["data"]["created_utc"];
+            // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'seconds_since'.
             seconds_since = subredditDate - utc_post;
+            // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'seconds_since'.
             postsDate.push(seconds_since);
           }
 
           // returns list with indexes of new posts last minute
+          // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'arr' implicitly has an 'any' type.
           const postsIndexes = postsDate.reduce(function (arr, e, i) {
             if (e <= 62) arr.push(i);
             return arr;
           }, []);
 
-          let lastMinutePosts = [];
+          let lastMinutePosts: any = [];
 
-          postsIndexes.forEach((i) => {
+          postsIndexes.forEach((i: any) => {
+            // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
             dictionary_to_push = {
               title: decodeN.decode(
                 postsJSON["data"]["children"][i]["data"]["title"].substring(
@@ -274,19 +293,25 @@ if (config.rhcp_subreddit_toggle) {
               ),
             };
 
+            // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
             if (!dictionary_to_push.thumbnail_image.startsWith("http")) {
+              // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
               dictionary_to_push.thumbnail_image =
                 "https://github.com/og-brandon/fleabot/blob/master/images/snoo.png?raw=true";
             }
 
             // replaces cases where self posts is just preview link broken
+            // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
             if (dictionary_to_push.self.startsWith("&amp")) {
+              // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
               dictionary_to_push.media_url = Object.values(
                 postsJSON["data"]["children"][0]["data"]["media_metadata"]
               )[0]["p"][0]["u"].replace("preview", "i");
+              // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
               dictionary_to_push.self = "";
             }
 
+            // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
             lastMinutePosts.push(dictionary_to_push);
           });
 
@@ -294,6 +319,7 @@ if (config.rhcp_subreddit_toggle) {
             config.rhcp_subreddit_channel_ID
           );
 
+          // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'post' implicitly has an 'any' type.
           lastMinutePosts.forEach((post) => {
             const subredditEmbed = new MessageEmbed()
               .setColor("#ff0019")
@@ -322,6 +348,7 @@ if (config.rhcp_subreddit_toggle) {
             }
             // if thumbnails is spoiler
             else if (
+              // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'dictionary_to_push'.
               dictionary_to_push.media_url.startsWith("http") === false
             ) {
               subredditEmbed.setThumbnail(
@@ -364,11 +391,12 @@ if (config.rhcp_subreddit_toggle) {
     } catch (error) {
       logger.error(error);
     }
+    // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'l'.
     l;
   });
 }
 
-client.on("interactionCreate", async (interaction) => {
+client.on("interactionCreate", async (interaction: any) => {
   if (!interaction.isCommand()) return;
 
   const command = client.commands.get(interaction.commandName);
