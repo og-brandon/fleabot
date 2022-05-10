@@ -40,7 +40,8 @@ export function getRandomInt(min: any, max: any) {
 export function extractMessageWithoutCommand(message: Message, prefix = MESSAGE_PREFIX) {
   const args = message.content.slice(prefix.length).trim().split(" ");
   args.shift()
-  return args;
+  const messageArguments = args.join(" ");
+  return messageArguments;
 }
 
 export function extractCommand(message: Message, prefix = MESSAGE_PREFIX) {
