@@ -1,12 +1,11 @@
-import {Client} from "discord.js";
+import {Client, Message} from "discord.js";
 import fs from "fs";
+import {MESSAGE_PREFIX} from "./constants";
 
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
-const discordClient = new Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
-discordClient.login(config.token);
-
-export const client = discordClient;
+export const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
+void client.login(config.token);
 
 export function nth_occurrence(string: any, char: any, nth: any): number {
   const first_index = string.indexOf(char);
@@ -38,16 +37,13 @@ export function getRandomInt(min: any, max: any) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function cToF(celsius: any) {
-  const cTemp = celsius;
-  const cToFahr = (cTemp * 9) / 5 + 32;
-  const rounded = Math.round(cToFahr * 10) / 10
-  return cTemp + "\xB0C is " + rounded + " \xB0F.";
+export function extractMessageWithoutCommand(message: Message, prefix = MESSAGE_PREFIX) {
+  const args = message.content.slice(prefix.length).trim().split(" ");
+  args.shift()
+  return args;
 }
 
-export function fToC(fahrenheit: any) {
-  const fTemp = fahrenheit;
-  const fToCel = ((fTemp - 32) * 5) / 9;
-  const rounded = Math.round(fToCel * 10) / 10
-  return fTemp + "\xB0F is " + rounded + "\xB0C.";
+export function extractCommand(message: Message, prefix = MESSAGE_PREFIX) {
+  const args = message.content.slice(prefix.length).trim().split(" ");
+  return args[0];
 }

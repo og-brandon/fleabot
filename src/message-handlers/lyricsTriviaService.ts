@@ -1,8 +1,8 @@
-import { logger } from "./logger";
+import { logger } from "../logger";
 import retry from "async-retry";
 import { Client } from "genius-lyrics";
 import fs from "fs";
-import { getRandomInt, nth_occurrence } from "./utils";
+import { getRandomInt, nth_occurrence } from "../utils";
 
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 const geniusClient = new Client(config.geniusToken);
