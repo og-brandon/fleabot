@@ -1,19 +1,20 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
+import {CommandInteraction, Interaction, MessageEmbed} from "discord.js";
 import { setTimeout } from "node:timers/promises";
 import { getRandomInt, nth_occurrence } from "../utils";
 
 import rhcpJSON from "./rhcplyrics.json";
+import {Command} from "./command";
 
 const waitTime = 15;
 const waitTimeBot = waitTime * 1000;
 const waitTimeText = `Guess in ${waitTime} seconds!`;
 
-export default {
+export const lyricsCommand: Command =  {
   data: new SlashCommandBuilder()
     .setName("lyrics")
     .setDescription("Guess which song it is based on the lyrics!"),
-  async execute(interaction: any) {
+  async execute(interaction: CommandInteraction) {
     const songRandomNumber = getRandomInt(0, rhcpJSON.length - 1);
 
     let songLyrics = rhcpJSON[songRandomNumber]["lyrics"];

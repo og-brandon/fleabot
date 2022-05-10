@@ -1,7 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
+import {Command} from "./command";
 
-export default {
+export const passCommand: Command =  {
   data: new SlashCommandBuilder()
     .setName("passdown")
     .setDescription("Pass down the stratocaster!"),

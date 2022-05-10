@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
 import gettyJSON from "./rhcpGetty.json";
-export default {
+import { Command } from "./command";
+
+export const imageCommand: Command = {
   data: new SlashCommandBuilder()
     .setName("image")
     .setDescription("Get a random image from the band!"),
