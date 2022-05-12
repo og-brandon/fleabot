@@ -7,23 +7,40 @@ import { getRandomInt, nth_occurrence } from "../utils";
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 const geniusClient = new Client(config.geniusToken);
 
-async function getArtistID(artist: any) {
+type ArtistIdAndName = {
+  artistId: number;
+  artistName: string;
+};
+
+async function getArtistID(artist: string): Promise<ArtistIdAndName> {
   const searches = await geniusClient.songs.search(artist);
   if (searches.length === 0) {
-    return null;
+    throw new Error(`No result found for artist ${artist}`);
   }
   const firstSong = searches[getRandomInt(1, 3)]; // max 10, coldplay returns coldplay and chainsmokers at 1 so we start at second entry.
+
+  if (!firstSong?.artist) {
+    throw new Error("No song or artist found");
+  }
+
   return {
     artistId: firstSong.artist?.id,
     artistName: firstSong?.artist?.name,
   };
 }
 
+type SongTitleAndArtist = {
+  songTitle: string;
+  songArtist: string;
+};
+
 // Choose a song title from the most popular 50 songs from given ID
-async function getSongNameAndTitle(artistObject: any) {
+async function getSongNameAndTitle(
+  artistObject: ArtistIdAndName
+): Promise<SongTitleAndArtist> {
   const artist = await geniusClient.artists.get(artistObject.artistId);
   if (!artist) {
-    return null;
+    throw new Error(`No artist found for id ${artistObject.artistId}`);
   }
   const totalPagesToLoad = 3;
 
@@ -46,7 +63,7 @@ async function getSongNameAndTitle(artistObject: any) {
   }
 
   if (foundSongs.length === 0) {
-    return null;
+    throw new Error(`No songs found for id ${artistObject.artistId}`);
   }
 
   const randomNumb = await getRandomInt(0, foundSongs.length);
@@ -56,11 +73,23 @@ async function getSongNameAndTitle(artistObject: any) {
   };
 }
 
-async function getSongObject(song: any, artist: any) {
-  const searches = await geniusClient.songs.search(song + " " + artist);
+type SongDetails = {
+  lyrics: string;
+  title: string;
+  art: string;
+  url: string;
+  artist: string;
+};
+
+async function getSongObject(sa: SongTitleAndArtist): Promise<SongDetails> {
+  const searches = await geniusClient.songs.search(
+    sa.songTitle + " " + sa.songArtist
+  );
 
   if (!searches || searches.length === 0) {
-    return null;
+    throw new Error(
+      `No result found for artist ${sa.songArtist} and title ${sa.songTitle}`
+    );
   }
 
   // Pick first one
@@ -76,11 +105,11 @@ async function getSongObject(song: any, artist: any) {
     title: songTitle,
     art: songArt,
     url: songUrl,
-    artist: artist,
+    artist: sa.songArtist,
   };
 }
 
-function getSectionFromSongObject(songObject: any) {
+function getSectionFromSongObject(songObject: SongDetails): string {
   // purifies lyrics string a bit
   songObject.lyrics = songObject.lyrics.replace("]\n\n[", "");
   try {
@@ -109,45 +138,27 @@ export async function getRandomSongSectionByArtist(messageArguments: any) {
   try {
     return await retry(
       async () => {
-        logger.info(`Retrieving random song for message ${messageArguments}`);
-        const artistId = await getArtistID(messageArguments);
-        if (!artistId) {
-          let msg = `No Artist ID for message ${messageArguments} found. Aborting or retrying...`;
-          logger.error(msg);
-          throw new Error(msg);
+        try {
+          logger.info(`Retrieving random song for message ${messageArguments}`);
+          const artistId = await getArtistID(messageArguments);
+          logger.info(
+            `Artist ID for message ${messageArguments} is ${artistId.artistId}`
+          );
+          const songChosen = await getSongNameAndTitle(artistId);
+          logger.info(
+            `Song title found for artist id ${artistId.artistId}: ${songChosen.songTitle}`
+          );
+          const songObject = await getSongObject(songChosen);
+          logger.info(`Retrieving section from song ${songChosen.songTitle}`);
+          let section = getSectionFromSongObject(songObject);
+          return {
+            ...songObject,
+            section,
+          };
+        } catch (e) {
+          logger.error("Failed to load song section", e);
+          throw e;
         }
-        logger.info(
-          `Artist ID for message ${messageArguments} is ${artistId.artistId}`
-        );
-        const songChosen = await getSongNameAndTitle(artistId);
-        if (!songChosen) {
-          let msg = `No song found for Artist ID ${artistId.artistId}. Aborting or retrying...`;
-          logger.error(msg);
-          throw new Error(msg);
-        }
-        logger.info(
-          `Song title found for artist id ${artistId.artistId}: ${songChosen.songTitle}`
-        );
-        const songObject = await getSongObject(
-          songChosen.songTitle,
-          songChosen.songArtist
-        );
-        if (!songObject) {
-          let msg = `No song object found for song title ${songChosen.songTitle}. Aborting or retrying...`;
-          logger.error(msg);
-          throw new Error(msg);
-        }
-        logger.info(`Retrieving section from song ${songChosen.songTitle}`);
-        let section = await getSectionFromSongObject(songObject);
-        if (!section) {
-          let msg = `No section found for song title ${songChosen.songTitle}. Aborting or retrying...`;
-          logger.error(msg);
-          throw new Error(msg);
-        }
-        return {
-          ...songObject,
-          section,
-        };
       },
       {
         minTimeout: 100,

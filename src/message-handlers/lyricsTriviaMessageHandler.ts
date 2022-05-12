@@ -13,12 +13,16 @@ export class LyricsTriviaMessageHandler extends MessageHandler {
   }
 
   async handle(message: Message): Promise<void> {
+    logger.info(`Starting lyricsTrivia game with message ${message}.`);
+
     message.channel.sendTyping();
     const embedColor: HexColorString = `#${Math.floor(
       Math.random() * 16777215
     ).toString(16)}`;
 
     const messageArguments = extractMessageWithoutCommand(message);
+
+    logger.info(`Message arguments: ${messageArguments}.`);
 
     if (!messageArguments) return
 
