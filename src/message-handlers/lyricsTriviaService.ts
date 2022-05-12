@@ -5,6 +5,7 @@ import fs from "fs";
 import { getRandomInt, nth_occurrence } from "../utils";
 
 const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
+logger.info(`Setting up genius with token ${config.geniusToken}`)
 const geniusClient = new Client(config.geniusToken);
 
 type ArtistIdAndName = {
@@ -82,8 +83,9 @@ type SongDetails = {
 };
 
 async function getSongObject(sa: SongTitleAndArtist): Promise<SongDetails> {
+  logger.info("Making search request to genius API")
   const searches = await geniusClient.songs.search(
-    sa.songTitle + " " + sa.songArtist
+    geniusClient.songs.sanitizeQuery(sa.songTitle + " " + sa.songArtist)
   );
 
   if (!searches || searches.length === 0) {
@@ -95,7 +97,7 @@ async function getSongObject(sa: SongTitleAndArtist): Promise<SongDetails> {
   // Pick first one
   const chosenSong = searches[0];
 
-  // Ok lets get the lyrics
+  logger.info("Making lyrics request to genius API")
   const songLyrics = await chosenSong.lyrics();
   const songTitle = chosenSong.title;
   const songArt = chosenSong.thumbnail;
