@@ -26,8 +26,10 @@ jobs:
         playbook: ./.github/workflows/ansible/update-fleabot-playbook.yml
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         inventory: |
-          [bots.funkymonks.xyz]
-          5.161.130.142
+          servers:
+            hosts:
+              bots.funkymonks.xyz:
+                ansible_host: "5.161.130.142"
 
     - name: Send CS end update message
       uses: appleboy/discord-action@master
