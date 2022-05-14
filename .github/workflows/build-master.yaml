@@ -20,28 +20,26 @@ jobs:
 
     - uses: DamianReeves/write-file-action@v1.0
       with:
-        path: $GITHUB_WORKSPACE/keys/id_rsa_bots
+        path: ./keys/id_rsa_bots
         contents: |
           ${{ secrets.SSH_PRIVATE_KEY }}
-          bla
         write-mode: overwrite
 
     - uses: DamianReeves/write-file-action@v1.0
       with:
-        path: $GITHUB_WORKSPACE/keys/id_rsa_bots.pub
+        path: ./keys/id_rsa_bots.pub
         contents: |
           ${{ secrets.SSH_PUBLIC_KEY }}
-          bla
         write-mode: overwrite
 
     - name: Install SSH key
       run: |
-        sudo chmod -R 400 "$GITHUB_WORKSPACE/keys/id_rsa_bots" "$GITHUB_WORKSPACE/keys/id_rsa_bots.pub"
-        diff <( ssh-keygen -y -e -f "~/keys/id_rsa_bots" ) <( ssh-keygen -y -e -f "$GITHUB_WORKSPACE/keys/id_rsa_bots.pub" )
+        sudo chmod -R 400 "./keys/id_rsa_bots" "./keys/id_rsa_bots.pub"
+        diff <( ssh-keygen -y -e -f "./keys/id_rsa_bots" ) <( ssh-keygen -y -e -f "./keys/id_rsa_bots.pub" )
 
     - name: Run playbook
       working-directory: ./.github/workflows/ansible
-      run: ansible-playbook update-fleabot-playbook.yml -vvv -i inventory.yml --key-file "$GITHUB_WORKSPACE/keys/id_rsa_bots"
+      run: ansible-playbook update-fleabot-playbook.yml -vvv -i inventory.yml --key-file "./keys/id_rsa_bots"
 
     - name: Send CS start update message
       uses: appleboy/discord-action@master
