@@ -2,8 +2,6 @@ name: deploy-master
 
 on:
   push:
-    branches:
-      - master
 
 jobs:
   deploy-to-bots_funkymonks_xyz:
@@ -38,7 +36,7 @@ jobs:
 
     - name: Install SSH key
       run: |
-        chmod -R 400 "$GITHUB_WORKSPACE/keys/id_rsa_bots" "$GITHUB_WORKSPACE/keys/id_rsa_bots.pub"
+        sudo chmod -R 400 "$GITHUB_WORKSPACE/keys/id_rsa_bots" "$GITHUB_WORKSPACE/keys/id_rsa_bots.pub"
         diff <( ssh-keygen -y -e -f "~/keys/id_rsa_bots" ) <( ssh-keygen -y -e -f "$GITHUB_WORKSPACE/keys/id_rsa_bots.pub" )
 
     - name: Run playbook
