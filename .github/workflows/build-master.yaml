@@ -21,7 +21,15 @@ jobs:
       uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+        name: id_rsa_bots
+        known_hosts: |
+          bots.funkymonks.xyz. ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC76TSDgWemPQ3sCstnlo+/qoXFi9RKoe+SEpc1fpTwF2zMNsQiJyMNoB9PLkPhw8nDeNKpWCjJbLeQh8NgvQAvaZN7yQui4ZpAGX3Vfjnsggi0Wwoqh8erYOl3NudhVy/wt6SDj49R413fHIirn58IoZrjwVf+0vEcWSve4lHaXksSXiLMUimmzkXJQ4x1ZKcftRJG71/LNZ5OifC8mNT7iLz44m1ZqkHxN3bFuwWjy+Eu+xri9SfaN3EOGS8HOxsFGH5davbvwFuJqXrS6NZ9c2V7HLzf7nbNUCjk1uywWLevfplo3k79jPf6T0Iv3TMvG+LHIn1xYDJUoiJMj64oxLmMedtCPaYahOYCjws0xaTVKzKRiUH6uu30BjiC1CdVIsC7jelVEacoJpdSoniEQnz0y0MUQEgtrX1H8qj2g+ggYIytBwGwyD6IJdoUlJdPB7siGqmuLTxpNc/TCJmuy/LXx7UeSDdNrmKA/MntsCixxl59UBtoNpecXEh7nIk=
+          bots.funkymonks.xyz. ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBxnjlZXAVVMKj/IF9W8y6YBid90b+aL79SDdfaFF+zQ4hCh54vd/nx5EJVsoap2E++t0O9aGR7X26WibnfbvjY=
+          bots.funkymonks.xyz. ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKur8BZluG6PRCuE8TK6tex0lqqVOFKIi0Ks1OdbL6ao
+        config: |
+          Host bots.funkymonks.xyz
+          User fleabot
+          IdentityFile ~/.ssh/id_rsa_bots
     - name: Run playbook
       run: ansible-playbook ./.github/workflows/ansible/update-fleabot-playbook.yml -vvv -i ./.github/workflows/ansible/inventory.yml
 

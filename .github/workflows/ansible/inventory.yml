@@ -1,4 +1,4 @@
 servers:
   hosts:
     bots.funkymonks.xyz:
-      ansible_host: "5.161.130.142"
+      ansible_host: "bots.funkymonks.xyz"
