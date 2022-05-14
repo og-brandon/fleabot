@@ -20,14 +20,14 @@ jobs:
         sudo apt install ansible
 
 
-    - uses: DamianReeves/write-file-action
+    - uses: DamianReeves/write-file-action@v1.0
       with:
         path: ${{ env.home }}/.ssh/id_rsa_bots
         contents: |
           ${{ secrets.SSH_PRIVATE_KEY }}
         write-mode: overwrite
 
-    - uses: DamianReeves/write-file-action
+    - uses: DamianReeves/write-file-action@v1.0
       with:
         path: ${{ env.home }}/.ssh/id_rsa_bots.pub
         contents: |
