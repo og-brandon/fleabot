@@ -21,7 +21,8 @@ jobs:
 
     - name: Install SSH key
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" >> ~/.ssh/id_rsa_bots        
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_bots        
 
     - name: Run playbook
       working-directory: ./.github/workflows/ansible
