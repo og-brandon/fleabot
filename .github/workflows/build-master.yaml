@@ -9,11 +9,28 @@ jobs:
   deploy-to-bots_funkymonks_xyz:
     runs-on: ubuntu-latest
     steps:
+
+    - name: Send CS start update message
+      uses: appleboy/discord-action@master
+      with:
+        webhook_id: ${{ secrets.CS_DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ secrets.CS_DISCORD_WEBHOOK_TOKEN }}
+        username: Fleabot updates
+        args: Fleabot is being updated. Stay tuned...
+
     - name: Run playbook
       uses: dawidd6/action-ansible-playbook@v2
       with:
-        playbook: ./ansible/update-fleabot-playbook.yml
+        playbook: ./github/workflows/ansible/update-fleabot-playbook.yml
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         inventory: |
           [bots.funkymonks.xyz]
           5.161.130.142
+
+    - name: Send CS end update message
+      uses: appleboy/discord-action@master
+      with:
+        webhook_id: ${{ secrets.CS_DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ secrets.CS_DISCORD_WEBHOOK_TOKEN }}
+        username: Fleabot updates
+        args: Fleabot update is finished!

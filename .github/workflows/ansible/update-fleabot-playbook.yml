@@ -5,14 +5,6 @@
   remote_user: fleabot
   tasks:
 
-  - name: Send CS start update message
-    uses: appleboy/discord-action@master
-    with:
-      webhook_id: ${{ secrets.CS_DISCORD_WEBHOOK_ID }}
-      webhook_token: ${{ secrets.CS_DISCORD_WEBHOOK_TOKEN }}
-      username: Fleabot updates
-      args: Fleabot is being updated. Stay tuned...
-
   - name: Update repository
     git:
       repo: 'https://github.com/Funky-Monks/fleabot'
@@ -23,11 +15,3 @@
     shell: pm2 restart dist/fleabot.js
     args:
       chdir: /home/fleabot/fleabot
-
-  - name: Send CS end update message
-    uses: appleboy/discord-action@master
-    with:
-      webhook_id: ${{ secrets.CS_DISCORD_WEBHOOK_ID }}
-      webhook_token: ${{ secrets.CS_DISCORD_WEBHOOK_TOKEN }}
-      username: Fleabot updates
-      args: Fleabot update is finished!
