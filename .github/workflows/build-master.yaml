@@ -36,7 +36,7 @@ jobs:
 
     - name: Install SSH key
       run: |
-        chmod -R 400 "$HOME/.ssh/id_rsa.*"
+        chmod -R 400 "$HOME/.ssh/id_rsa_bots" "$HOME/.ssh/id_rsa_bots.pub"
         diff <( ssh-keygen -y -e -f "~/.ssh/id_rsa_bots" ) <( ssh-keygen -y -e -f "$HOME/.ssh/id_rsa_bots.pub" )
 
     - name: Run playbook
