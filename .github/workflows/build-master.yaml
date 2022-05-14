@@ -17,28 +17,13 @@ jobs:
         sudo add-apt-repository --yes --update ppa:ansible/ansible
         sudo apt install ansible
 
-
-    - uses: DamianReeves/write-file-action@v1.0
+    - name: Install SSH Key
+      uses: shimataro/ssh-key-action@v2
       with:
-        path: ./keys/id_rsa_bots
-        contents: |
-          ${{ secrets.SSH_PRIVATE_KEY }}
-        write-mode: overwrite
-
-    - uses: DamianReeves/write-file-action@v1.0
-      with:
-        path: ./keys/id_rsa_bots.pub
-        contents: |
-          ${{ secrets.SSH_PUBLIC_KEY }}
-        write-mode: overwrite
-
-    - name: Install SSH key
-      run: |
-        sudo chmod -R 400 "./keys/id_rsa_bots" "./keys/id_rsa_bots.pub"
-        diff <( ssh-keygen -y -e -f "./keys/id_rsa_bots" ) <( ssh-keygen -y -e -f "./keys/id_rsa_bots.pub" )
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Run playbook
-      run: ansible-playbook ./.github/workflows/ansible/update-fleabot-playbook.yml -vvv -i ./.github/workflows/ansible/inventory.yml --key-file "./keys/id_rsa_bots"
+      run: ansible-playbook ./.github/workflows/ansible/update-fleabot-playbook.yml -vvv -i ./.github/workflows/ansible/inventory.yml
 
     - name: Send CS start update message
       uses: appleboy/discord-action@master
