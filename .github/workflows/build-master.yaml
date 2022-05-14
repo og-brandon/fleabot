@@ -22,26 +22,26 @@ jobs:
 
     - uses: DamianReeves/write-file-action@v1.0
       with:
-        path: ${{ env.home }}/.ssh/id_rsa_bots
+        path: $HOME/.ssh/id_rsa_bots
         contents: |
           ${{ secrets.SSH_PRIVATE_KEY }}
         write-mode: overwrite
 
     - uses: DamianReeves/write-file-action@v1.0
       with:
-        path: ${{ env.home }}/.ssh/id_rsa_bots.pub
+        path: $HOME/.ssh/id_rsa_bots.pub
         contents: |
           ${{ secrets.SSH_PUBLIC_KEY }}
         write-mode: overwrite
 
     - name: Install SSH key
       run: |
-        chmod -R 400 "${{ env.home }}/.ssh/id_rsa.*"
-        diff <( ssh-keygen -y -e -f "~/.ssh/id_rsa_bots" ) <( ssh-keygen -y -e -f "${{ env.home }}/.ssh/id_rsa_bots.pub" )
+        chmod -R 400 "$HOME/.ssh/id_rsa.*"
+        diff <( ssh-keygen -y -e -f "~/.ssh/id_rsa_bots" ) <( ssh-keygen -y -e -f "$HOME/.ssh/id_rsa_bots.pub" )
 
     - name: Run playbook
       working-directory: ./.github/workflows/ansible
-      run: ansible-playbook update-fleabot-playbook.yml -vvv -i inventory.yml --key-file "${{ env.home }}/.ssh/id_rsa_bots"
+      run: ansible-playbook update-fleabot-playbook.yml -vvv -i inventory.yml --key-file "$HOME/.ssh/id_rsa_bots"
 
     - name: Send CS start update message
       uses: appleboy/discord-action@master
