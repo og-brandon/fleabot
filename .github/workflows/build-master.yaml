@@ -22,8 +22,10 @@ jobs:
     - name: Install SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_bots        
-        chmod 400 ~/.ssh/id_rsa_bots
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_bots
+        echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa_bots.pub
+        diff <( ssh-keygen -y -e -f "~/.ssh/id_rsa_bots" ) <( ssh-keygen -y -e -f "~/.ssh/id_rsa_bots.pub" )
+        chmod 400 ~/.ssh/id_rsa.*
 
     - name: Run playbook
       working-directory: ./.github/workflows/ansible
