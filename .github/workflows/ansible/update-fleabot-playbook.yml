@@ -1,0 +1,33 @@
+---
+- name: Update esmbot
+  hosts: bots.funkymonks.xyz
+  gather_facts: true
+  remote_user: fleabot
+  tasks:
+
+  - name: Send CS start update message
+    uses: appleboy/discord-action@master
+    with:
+      webhook_id: ${{ secrets.CS_DISCORD_WEBHOOK_ID }}
+      webhook_token: ${{ secrets.CS_DISCORD_WEBHOOK_TOKEN }}
+      username: Fleabot updates
+      args: Fleabot is being updated. Stay tuned...
+
+  - name: Update repository
+    git:
+      repo: 'https://github.com/Funky-Monks/fleabot'
+      dest: /home/fleabot/fleabot
+      force: yes
+
+  - name: Run application
+    shell: pm2 restart dist/fleabot.js
+    args:
+      chdir: /home/fleabot/fleabot
+
+  - name: Send CS end update message
+    uses: appleboy/discord-action@master
+    with:
+      webhook_id: ${{ secrets.CS_DISCORD_WEBHOOK_ID }}
+      webhook_token: ${{ secrets.CS_DISCORD_WEBHOOK_TOKEN }}
+      username: Fleabot updates
+      args: Fleabot update is finished!
