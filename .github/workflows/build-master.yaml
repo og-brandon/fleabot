@@ -38,8 +38,7 @@ jobs:
         diff <( ssh-keygen -y -e -f "./keys/id_rsa_bots" ) <( ssh-keygen -y -e -f "./keys/id_rsa_bots.pub" )
 
     - name: Run playbook
-      working-directory: ./.github/workflows/ansible
-      run: ansible-playbook update-fleabot-playbook.yml -vvv -i inventory.yml --key-file "./keys/id_rsa_bots"
+      run: ansible-playbook ./.github/workflows/ansible/update-fleabot-playbook.yml -vvv -i ./.github/workflows/ansible/inventory.yml --key-file "./keys/id_rsa_bots"
 
     - name: Send CS start update message
       uses: appleboy/discord-action@master
