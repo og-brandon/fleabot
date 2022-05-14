@@ -23,7 +23,7 @@ jobs:
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_bots        
-        chmod 644 ~/.ssh/id_rsa_bots
+        chmod 400 ~/.ssh/id_rsa_bots
 
     - name: Run playbook
       working-directory: ./.github/workflows/ansible
